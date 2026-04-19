@@ -1,16 +1,30 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+import { useLenis } from "@/hooks/useLenis";
+import Navbar from "@/components/site/Navbar";
+import Hero from "@/components/site/Hero";
+import ProblemSolution from "@/components/site/ProblemSolution";
+import Services from "@/components/site/Services";
+import Process from "@/components/site/Process";
+import Work from "@/components/site/Work";
+import Trust from "@/components/site/Trust";
+import CTA from "@/components/site/CTA";
+import Footer from "@/components/site/Footer";
 
-// IMPORTANT: Fully REPLACE this with your own code
-const PlaceholderIndex = () => {
-  // PLACEHOLDER: Replace this entire return statement with the user's app.
-  // The inline background color is intentionally not part of the design system.
+const Index = () => {
+  useLenis();
+
   return (
-    <div className="flex min-h-screen items-center justify-center" style={{ backgroundColor: '#fcfbf8' }}>
-      <img data-lovable-blank-page-placeholder="REMOVE_THIS" src="/placeholder.svg" alt="Your app will live here!" />
-    </div>
+    <main className="relative min-h-screen overflow-x-hidden bg-background text-foreground">
+      <Navbar />
+      <Hero />
+      <ProblemSolution />
+      <Services />
+      <Process />
+      <Work />
+      <Trust />
+      <CTA />
+      <Footer />
+    </main>
   );
 };
-
-const Index = PlaceholderIndex;
 
 export default Index;
