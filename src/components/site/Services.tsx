@@ -45,28 +45,9 @@ const Services = () => {
   const [active, setActive] = useState<number | null>(null);
 
   return (
-    <section id="services" className="relative py-24 md:py-32">
-      <div className="absolute inset-0 grid-bg opacity-30" />
-      <div className="absolute right-0 top-1/4 h-[500px] w-[500px] rounded-full bg-accent/10 blur-[140px]" />
-
+    <section className="relative py-16 md:py-24 bg-background">
       <div className="relative container-px mx-auto">
-        <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
-          <div className="max-w-2xl">
-            <span className="inline-block rounded-full glass px-3 py-1 text-xs text-primary">
-              What we do
-            </span>
-            <h2 className="mt-5 font-display text-4xl font-semibold tracking-tight md:text-5xl">
-              A full-stack engineering practice for{" "}
-              <span className="text-gradient-gold">wireless infrastructure.</span>
-            </h2>
-          </div>
-          <p className="max-w-md text-muted-foreground">
-            Six disciplines, one team. From the bolt to the byte — we engineer
-            every layer that keeps networks online.
-          </p>
-        </div>
-
-        <div className="mt-14 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {services.map((s, i) => {
             const Icon = s.icon;
             const isActive = active === i;
@@ -79,19 +60,16 @@ const Services = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "-50px" }}
                 transition={{ duration: 0.6, delay: i * 0.06 }}
-                className="group relative overflow-hidden rounded-2xl border border-border/50 bg-gradient-card p-7 text-left transition-all duration-500 hover:border-primary/40 hover:shadow-elevated hover:-translate-y-1"
+                className="group relative overflow-hidden rounded-2xl border border-border bg-card p-7 text-left transition-all duration-500 hover:border-primary/40 hover:shadow-[var(--shadow-elevated)] hover:-translate-y-1"
               >
-                {/* Glow on hover */}
-                <div className="pointer-events-none absolute -top-20 -right-20 h-48 w-48 rounded-full bg-primary/0 blur-3xl transition-all duration-500 group-hover:bg-primary/20" />
-
                 <div className="relative flex items-start justify-between">
-                  <div className="grid h-12 w-12 place-items-center rounded-xl bg-secondary/60 text-primary transition-all group-hover:bg-gradient-gold group-hover:text-primary-foreground group-hover:shadow-glow-gold">
+                  <div className="grid h-12 w-12 place-items-center rounded-xl bg-primary/10 text-primary transition-all group-hover:bg-primary group-hover:text-white">
                     <Icon size={20} />
                   </div>
                   <span className="font-display text-xs text-muted-foreground">{s.code}</span>
                 </div>
 
-                <h3 className="relative mt-6 font-display text-xl font-semibold">
+                <h3 className="relative mt-6 font-display text-xl font-semibold text-foreground">
                   {s.title}
                 </h3>
                 <p className="relative mt-3 text-sm leading-relaxed text-muted-foreground">
@@ -102,7 +80,7 @@ const Services = () => {
                   <motion.div
                     initial={{ opacity: 0, height: 0 }}
                     animate={{ opacity: 1, height: "auto" }}
-                    className="relative mt-5 border-t border-border/50 pt-5 text-sm text-foreground/80"
+                    className="relative mt-5 border-t border-border pt-5 text-sm text-foreground/80"
                   >
                     Includes deliverables: detailed engineering report,
                     stamped drawings, modification recommendations and a 3D

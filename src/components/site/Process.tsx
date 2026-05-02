@@ -11,15 +11,13 @@ const steps = [
 
 const Process = () => {
   return (
-    <section id="process" className="relative py-24 md:py-32">
-      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-secondary/20 to-transparent" />
-
+    <section className="relative py-24 md:py-32 bg-background">
       <div className="relative container-px mx-auto">
         <div className="mx-auto max-w-2xl text-center">
-          <span className="inline-block rounded-full glass px-3 py-1 text-xs text-primary">
+          <span className="inline-block rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
             Our process
           </span>
-          <h2 className="mt-5 font-display text-4xl font-semibold tracking-tight md:text-5xl">
+          <h2 className="mt-5 font-display text-4xl font-semibold tracking-tight md:text-5xl text-foreground">
             From survey to{" "}
             <span className="text-gradient-fire">stamped drawing</span>
           </h2>
@@ -29,8 +27,7 @@ const Process = () => {
         </div>
 
         <div className="relative mt-20">
-          {/* Connecting line */}
-          <div className="absolute left-1/2 top-0 hidden h-full w-px -translate-x-1/2 bg-gradient-to-b from-transparent via-primary/30 to-transparent lg:block" />
+          <div className="absolute left-1/2 top-0 hidden h-full w-px -translate-x-1/2 bg-gradient-to-b from-transparent via-primary/20 to-transparent lg:block" />
 
           <div className="space-y-12 lg:space-y-20">
             {steps.map((step, i) => {
@@ -50,9 +47,9 @@ const Process = () => {
                       <span className="font-display text-xs text-muted-foreground">
                         Phase 0{i + 1}
                       </span>
-                      <span className="h-px w-12 bg-primary/40" />
+                      <span className="h-px w-12 bg-primary/30" />
                     </div>
-                    <h3 className="mt-3 font-display text-2xl font-semibold md:text-3xl">
+                    <h3 className="mt-3 font-display text-2xl font-semibold md:text-3xl text-foreground">
                       {step.title}
                     </h3>
                     <p className="mt-3 max-w-md text-muted-foreground lg:max-w-none lg:ml-auto">
@@ -61,8 +58,8 @@ const Process = () => {
                   </div>
 
                   <div className="relative grid place-items-center lg:px-12">
-                    <div className="absolute h-32 w-32 rounded-full bg-primary/10 blur-2xl" />
-                    <div className="relative grid h-20 w-20 place-items-center rounded-2xl glass border-gradient">
+                    <div className="absolute h-32 w-32 rounded-full bg-primary/5 blur-2xl" />
+                    <div className="relative grid h-20 w-20 place-items-center rounded-2xl border border-border bg-card shadow-[var(--shadow-card)]">
                       <Icon size={28} className="text-primary" />
                     </div>
                   </div>

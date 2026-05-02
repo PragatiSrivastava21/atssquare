@@ -1,44 +1,48 @@
 import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Link } from "react-router-dom";
 
 const CTA = () => {
   return (
-    <section id="contact" className="relative py-24 md:py-36">
+    <section className="relative py-24 md:py-36">
       <div className="container-px mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 40 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8 }}
-          className="relative overflow-hidden rounded-3xl border border-border/50 bg-gradient-card p-10 md:p-20"
+          className="relative overflow-hidden rounded-3xl bg-foreground p-10 md:p-20 text-white"
         >
-          {/* Decorative glows */}
-          <div className="absolute -top-32 -left-32 h-96 w-96 rounded-full bg-highlight/20 blur-[120px]" />
-          <div className="absolute -bottom-32 -right-32 h-96 w-96 rounded-full bg-accent/20 blur-[120px]" />
-          <div className="absolute inset-0 grid-bg opacity-40" />
+          <div className="absolute -top-32 -left-32 h-96 w-96 rounded-full bg-accent/20 blur-[120px]" />
+          <div className="absolute -bottom-32 -right-32 h-96 w-96 rounded-full bg-primary/20 blur-[120px]" />
 
           <div className="relative grid gap-10 lg:grid-cols-[1.3fr_1fr] lg:items-center">
             <div>
-              <span className="inline-block rounded-full glass px-3 py-1 text-xs text-primary">
+              <span className="inline-block rounded-full bg-white/10 px-3 py-1 text-xs text-accent border border-white/10">
                 Let's build
               </span>
               <h2 className="mt-5 font-display text-4xl font-semibold tracking-tight md:text-6xl">
                 Let's build reliable{" "}
-                <span className="text-gradient-hero">infrastructure</span>{" "}
+                <span className="text-gradient-gold">infrastructure</span>{" "}
                 together.
               </h2>
-              <p className="mt-6 max-w-xl text-muted-foreground md:text-lg">
+              <p className="mt-6 max-w-xl text-white/70 md:text-lg">
                 Tell us about your network. We'll respond within one business
                 day with a scoped proposal.
               </p>
               <div className="mt-8 flex flex-wrap gap-4">
-                <Button variant="hero" size="xl">
+                <Link
+                  to="/contact"
+                  className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-accent to-[hsl(44,80%,58%)] px-6 py-3.5 text-sm font-semibold text-white shadow-[var(--glow-gold)] transition-all hover:shadow-[0_0_60px_hsl(44,65%,52%/0.5)]"
+                >
                   Start a project <ArrowRight size={16} />
-                </Button>
-                <Button variant="glass" size="xl">
+                </Link>
+                <Link
+                  to="/contact"
+                  className="inline-flex items-center gap-2 rounded-xl border border-white/20 bg-white/5 px-6 py-3.5 text-sm font-semibold text-white backdrop-blur transition hover:bg-white/10"
+                >
                   Book a 30-min call
-                </Button>
+                </Link>
               </div>
             </div>
 
@@ -50,9 +54,9 @@ const CTA = () => {
               ].map((row) => (
                 <div
                   key={row.k}
-                  className="flex items-center justify-between rounded-xl glass px-5 py-4"
+                  className="flex items-center justify-between rounded-xl bg-white/5 border border-white/10 px-5 py-4"
                 >
-                  <span className="text-sm text-muted-foreground">{row.k}</span>
+                  <span className="text-sm text-white/60">{row.k}</span>
                   <span className="font-display font-semibold text-gradient-gold">
                     {row.v}
                   </span>
