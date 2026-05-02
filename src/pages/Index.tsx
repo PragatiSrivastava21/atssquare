@@ -1,8 +1,8 @@
 import { useLenis } from "@/hooks/useLenis";
 import Navbar from "@/components/site/Navbar";
 import Hero from "@/components/site/Hero";
+import StatsCounter from "@/components/site/StatsCounter";
 import ProblemSolution from "@/components/site/ProblemSolution";
-import Services from "@/components/site/Services";
 import Process from "@/components/site/Process";
 import Work from "@/components/site/Work";
 import Trust from "@/components/site/Trust";
@@ -16,8 +16,8 @@ const Index = () => {
     <main className="relative min-h-screen overflow-x-hidden bg-background text-foreground">
       <Navbar />
       <Hero />
+      <StatsCounter />
       <ProblemSolution />
-      <Services />
       <Process />
       <Work />
       <Trust />
