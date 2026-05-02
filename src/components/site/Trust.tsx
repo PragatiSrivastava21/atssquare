@@ -13,7 +13,7 @@ const logos = [
 
 const Trust = () => {
   return (
-    <section id="about" className="relative py-24 md:py-32">
+    <section className="relative py-24 md:py-32 bg-background">
       <div className="container-px mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -22,37 +22,14 @@ const Trust = () => {
           transition={{ duration: 0.7 }}
           className="mx-auto max-w-3xl text-center"
         >
-          <span className="inline-block rounded-full glass px-3 py-1 text-xs text-primary">
+          <span className="inline-block rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
             Trusted by industry leaders
           </span>
-          <h2 className="mt-5 font-display text-4xl font-semibold tracking-tight md:text-5xl">
+          <h2 className="mt-5 font-display text-4xl font-semibold tracking-tight md:text-5xl text-foreground">
             The teams keeping networks alive{" "}
             <span className="text-gradient-gold">build with us.</span>
           </h2>
         </motion.div>
-
-        <div className="mt-12 grid grid-cols-2 gap-6 md:grid-cols-4 md:gap-10">
-          {[
-            { v: "12,400+", l: "Tower assessments" },
-            { v: "1.2 Bn lb", l: "Steel engineered" },
-            { v: "18 yrs", l: "Average team experience" },
-            { v: "0", l: "Structural failures on record" },
-          ].map((s, i) => (
-            <motion.div
-              key={s.l}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6, delay: i * 0.08 }}
-              className="rounded-2xl border border-border/50 bg-gradient-card p-6 text-center"
-            >
-              <div className="font-display text-3xl font-semibold text-gradient-gold md:text-4xl">
-                {s.v}
-              </div>
-              <div className="mt-2 text-xs text-muted-foreground md:text-sm">{s.l}</div>
-            </motion.div>
-          ))}
-        </div>
 
         {/* Marquee */}
         <div className="relative mt-16 overflow-hidden">
