@@ -27,16 +27,7 @@ const Navbar = () => {
     >
       <nav className="container-px mx-auto flex h-16 items-center justify-between md:h-20">
         <Link to="/" className="group flex items-center gap-2.5">
-          <div className="relative h-8 w-8">
-            <div className="absolute inset-0 rounded-md bg-gradient-to-br from-primary to-[hsl(217,80%,40%)] shadow-md" />
-            <div className="absolute inset-[3px] rounded-[5px] bg-white grid place-items-center">
-              <span className="font-display text-[11px] font-bold text-primary">A</span>
-            </div>
-          </div>
-          <div className="flex flex-col leading-none">
-            <span className="font-display text-sm font-semibold tracking-wide text-foreground">ATSS</span>
-            <span className="text-[10px] text-muted-foreground">Tower Engineering</span>
-          </div>
+          <img src="/ats2-logo.png" alt="ATS² Logo" className="h-12 md:h-16 object-contain" />
         </Link>
 
         <div className="hidden items-center gap-8 md:flex">
@@ -44,15 +35,15 @@ const Navbar = () => {
             <Link
               key={l.href}
               to={l.href}
-              className={`relative text-sm transition-colors hover:text-primary ${
-                location.pathname === l.href ? "font-medium text-primary" : "text-muted-foreground"
+              className={`relative text-sm transition-colors hover:text-[hsl(44,65%,52%)] ${
+                location.pathname === l.href ? "font-medium text-[hsl(44,65%,52%)]" : "text-[#0B1F3A]"
               }`}
             >
               {l.label}
               {location.pathname === l.href && (
                 <motion.span
                   layoutId="nav-underline"
-                  className="absolute -bottom-1 left-0 right-0 h-0.5 rounded-full bg-primary"
+                  className="absolute -bottom-1 left-0 right-0 h-0.5 rounded-full bg-[hsl(44,65%,52%)]"
                 />
               )}
             </Link>
@@ -76,8 +67,8 @@ const Navbar = () => {
                 key={l.href}
                 to={l.href}
                 onClick={() => setOpen(false)}
-                className={`text-sm hover:text-primary ${
-                  location.pathname === l.href ? "font-medium text-primary" : "text-muted-foreground"
+                className={`text-sm transition-colors hover:text-[hsl(44,65%,52%)] ${
+                  location.pathname === l.href ? "font-medium text-[hsl(44,65%,52%)]" : "text-[#0B1F3A]"
                 }`}
               >
                 {l.label}
