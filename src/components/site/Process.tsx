@@ -18,8 +18,8 @@ const Process = () => {
             Our process
           </span>
           <h2 className="mt-5 font-display text-4xl font-semibold tracking-tight md:text-5xl text-foreground">
-            From survey to{" "}
-            <span className="text-gradient-fire">stamped drawing</span>
+            From structural calculations to{" "}
+            <span className="text-gradient-fire">approved designs</span>
           </h2>
           <p className="mt-5 text-muted-foreground">
             Five rigorous phases. Average turnaround of 14 business days.
@@ -59,8 +59,8 @@ const Process = () => {
 
                   <div className="relative grid place-items-center lg:px-12">
                     <div className="absolute h-32 w-32 rounded-full bg-primary/5 blur-2xl" />
-                    <div className="relative grid h-20 w-20 place-items-center rounded-2xl border border-border bg-card shadow-[var(--shadow-card)]">
-                      <Icon size={28} className="text-primary" />
+                    <div className="group relative grid h-20 w-20 place-items-center rounded-2xl border border-border bg-blue-900 shadow-[var(--shadow-card)] transition-all duration-300 hover:border-yellow-600">
+                      <Icon size={28} className="text-white transition-colors duration-300 group-hover:text-yellow-600" />
                     </div>
                   </div>
                 </motion.div>

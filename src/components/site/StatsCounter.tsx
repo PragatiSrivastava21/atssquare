@@ -25,7 +25,7 @@ const stats = [
   { value: 12400, suffix: "+", label: "Towers Analyzed" },
   { value: 99.97, suffix: "%", label: "Structural Integrity Rate", decimals: 2 },
   { value: 14, suffix: "", label: "Countries Deployed" },
-  { value: 18, suffix: " yrs", label: "Average Team Experience" },
+  { value: 25, suffix: " yrs+", label: "Years of Experience" },
 ];
 
 const StatsCounter = () => {
@@ -33,7 +33,7 @@ const StatsCounter = () => {
   const inView = useInView(ref, { once: true, margin: "-100px" });
 
   return (
-    <section ref={ref} className="relative py-20 md:py-28 bg-background">
+    <section ref={ref} className="relative  bg-background pt-40 pb-20"  >
       <div className="container-px mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -72,7 +72,7 @@ const CounterCard = ({ stat, index, inView }: { stat: typeof stats[0]; index: nu
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ duration: 0.6, delay: index * 0.1 }}
-      className="rounded-2xl border border-border bg-card p-6 text-center shadow-[var(--shadow-card)] hover:shadow-[var(--shadow-elevated)] transition-shadow"
+      className="rounded-2xl border border-border bg-card p-6 text-center shadow-[var(--shadow-card)] transition duration-300 hover:-translate-y-1 hover:border-slate-900 hover:bg-slate-950/5 hover:shadow-[0_35px_60px_rgba(15,23,42,0.25)]"
     >
       <div className="font-display text-3xl font-bold text-primary md:text-4xl">
         {displayValue}{stat.suffix}

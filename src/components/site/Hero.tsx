@@ -2,9 +2,9 @@ import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { ArrowRight, Radio } from "lucide-react";
-import t1 from "@/assets/tower-slide-1.jpg";
-import t2 from "@/assets/tower-slide-2.jpg";
-import t3 from "@/assets/tower-slide-3.jpg";
+import t1 from "@/assets/2.png";
+import t2 from "@/assets/towerr.png";
+import t3 from "@/assets/tower-slide-2.jpg";
 import t4 from "@/assets/tower-slide-4.jpg";
 
 const slides = [
@@ -21,6 +21,7 @@ const slides = [
     img: t2,
     alt: "Lattice tower at golden hour",
     headlinePre: "Monopoles built to",
+    imgClass: "object-contain object-center scale-75", 
     headlineAccent: "withstand",
     headlinePost: "every storm.",
     subtitle:
@@ -57,7 +58,9 @@ const Hero = () => {
 
 
   return (
-    <section className="relative min-h-screen overflow-hidden bg-white text-foreground">
+    <section className="relative min-h-screen overflow-hidden bg-white text-foreground " style={{ 
+  background: "linear-gradient(to bottom, #091a3d 0%, #0f2451 30%, #1a3a6b 45%, #2e5fa3 70%, #7a9fd4 82%, #d0ddf0 92%, #ffffff 100%)" 
+}}>
       {/* Slider background */}
       <div className="absolute inset-0">
         <AnimatePresence mode="wait">
@@ -139,7 +142,7 @@ const Hero = () => {
           >
             <Link
               to="/services"
-              className="group inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-accent to-[hsl(44,80%,58%)] px-6 py-3.5 text-sm font-semibold text-white shadow-[var(--glow-gold)] transition-all hover:shadow-[0_0_80px_hsl(44,65%,52%/0.5)]"
+              className="group inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-slate-900 via-blue-700 to-blue-500 px-6 py-3.5 text-sm font-semibold text-white shadow-[0_0_36px_rgba(15,23,42,0.3)] transition-all hover:shadow-[0_0_80px_rgba(59,130,246,0.35)]"
             >
               Explore Services
               <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
@@ -164,7 +167,22 @@ const Hero = () => {
         ))}
       </div>
 
-      {/* Scroll cue removed per request */}
+ 
+  <div
+    className="absolute bottom-0 left-0 w-full h-32 bg-gradient-to-r from-slate-900 via-blue-700 to-blue-500"
+    style={{
+      clipPath: "polygon(0 40%, 25% 70%, 55% 45%, 75% 55%, 100% 40%, 100% 100%, 0% 100%)",
+    }}
+  />
+
+  {/* White section below */}
+  <div
+    className="absolute bottom-0 left-0 w-full h-28 bg-white "
+    style={{
+      clipPath: "polygon(0 60%, 25% 80%, 55% 55%, 75% 65%, 100% 50%, 100% 100%, 0% 100%)",
+    }}
+  />
+
     </section>
   );
 };

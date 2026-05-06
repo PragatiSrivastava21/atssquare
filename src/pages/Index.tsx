@@ -19,7 +19,7 @@ const Index = () => {
       <StatsCounter />
       <ProblemSolution />
       <Process />
-      <Work />
+      
       <Trust />
       <CTA />
       <Footer />

@@ -1,14 +1,13 @@
 import { motion } from "framer-motion";
 
 const logos = [
-  "VERTEX TELECOM",
-  "NORDSTREAM 5G",
-  "APEX TOWERS",
-  "LATTICE NETWORKS",
-  "MERIDIAN WIRELESS",
-  "SIGNAL CORP",
-  "AURORA COMMS",
-  "ATLAS INFRA",
+  "SBA COMMUNICATIONS",
+  "GPD",
+  "ALM BOY",
+  "ALL PRO",
+  "ALL FASTENER",
+  "VERTICAL BRIDGE",
+  
 ];
 
 const Trust = () => {

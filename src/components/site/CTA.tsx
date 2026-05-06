@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 
 const CTA = () => {
   return (
-    <section className="relative py-24 md:py-36">
+    <section className="relative pb-15">
       <div className="container-px mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 40 }}
@@ -37,12 +37,7 @@ const CTA = () => {
                 >
                   Start a project <ArrowRight size={16} />
                 </Link>
-                <Link
-                  to="/contact"
-                  className="inline-flex items-center gap-2 rounded-xl border border-white/20 bg-white/5 px-6 py-3.5 text-sm font-semibold text-white backdrop-blur transition hover:bg-white/10"
-                >
-                  Book a 30-min call
-                </Link>
+               
               </div>
             </div>
 
