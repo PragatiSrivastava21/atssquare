@@ -2,6 +2,9 @@ import { useLenis } from "@/hooks/useLenis";
 import Navbar from "@/components/site/Navbar";
 import Footer from "@/components/site/Footer";
 import Trust from "@/components/site/Trust";
+import CEOSection from "@/components/site/about/CEOSection";
+import TeamSection from "@/components/site/about/TeamSection";
+import WhatWeDoSection from "@/components/site/about/WhatWeDoSection";
 import { motion } from "framer-motion";
 import { Target, Eye, Shield, Users } from "lucide-react";
 
@@ -63,6 +66,9 @@ const About = () => {
         </div>
       </section>
 
+      <CEOSection />
+      <TeamSection />
+      <WhatWeDoSection />
       <Trust />
       <Footer />
     </main>
