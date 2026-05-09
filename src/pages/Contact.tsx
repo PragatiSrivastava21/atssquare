@@ -2,7 +2,7 @@ import { useLenis } from "@/hooks/useLenis";
 import Navbar from "@/components/site/Navbar";
 import Footer from "@/components/site/Footer";
 import { motion } from "framer-motion";
-import { Mail, Phone, MapPin } from "lucide-react";
+import { Mail, Phone, MapPin, ArrowUpRight } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 
