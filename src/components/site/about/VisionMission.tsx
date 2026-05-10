@@ -26,7 +26,7 @@ const VisionMission = () => {
           whileInView={{ opacity: 1, x: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.7 }}
-          className="group relative rounded-3xl border border-border bg-card p-10 shadow-[var(--shadow-card)] hover:shadow-[var(--shadow-elevated)] transition-all duration-500 overflow-hidden"
+          className="group relative rounded-3xl hover:border-slate-900 hover:bg-slate-950/5 hover:shadow-[0_35px_60px_rgba(15,23,42,0.25) shadow-[var(--shadow-card)] border border-border bg-card p-10 shadow-[var(--shadow-card)] hover:shadow-[var(--shadow-elevated)] transition-all duration-500 overflow-hidden"
         >
           <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
           <div className="relative z-10">
@@ -35,8 +35,8 @@ const VisionMission = () => {
             </div>
             <h3 className="mt-7 font-display text-2xl font-semibold">Our Vision</h3>
             <p className="mt-4 text-muted-foreground leading-relaxed">
-              To become a globally trusted leader in telecom tower engineering by delivering innovative, reliable, and future-ready structural solutions that strengthen modern connectivity infrastructure.
-            </p>
+              To be the foremost provider of engineering solutions for the wireless industry, known for our dedication to structural excellence and our ability to deliver results that stand the test of time. We envision
+               a future where our innovations set the benchmark for safety and performance in wireless infrastructure.      </p>
           </div>
         </motion.div>
 
@@ -46,7 +46,7 @@ const VisionMission = () => {
           whileInView={{ opacity: 1, x: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.7, delay: 0.15 }}
-          className="group relative rounded-3xl border border-border bg-card p-10 shadow-[var(--shadow-card)] hover:shadow-[var(--shadow-elevated)] transition-all duration-500 overflow-hidden"
+          className="group relative rounded-3xl border border-border bg-card p-10 shadow-[var(--shadow-card)] hover:shadow-[var(--shadow-elevated)] transition-all duration-500 overflow-hidden hover:border-slate-900 hover:bg-slate-950/5 hover:shadow-[0_35px_60px_rgba(15,23,42,0.25)"
         >
           <div className="absolute inset-0 bg-gradient-to-br from-accent/5 via-transparent to-highlight/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
           <div className="relative z-10">
@@ -55,8 +55,8 @@ const VisionMission = () => {
             </div>
             <h3 className="mt-7 font-display text-2xl font-semibold">Our Mission</h3>
             <p className="mt-4 text-muted-foreground leading-relaxed">
-              Our mission is to provide precise, efficient, and technology-driven engineering solutions for telecom infrastructure through advanced analysis, simulation, and client-focused execution while maintaining the highest standards of safety and quality.
-            </p>
+             Our mission is to deliver superior engineering services that ensure the safety, stability, and efficiency of wireless infrastructure. 
+             We strive to exceed industry standards through our commitment to quality, transparency, and continuous improvement. By leveraging state-of-the-art technologies and our extensive expertise, we aim to be your trusted partner in building a robust and reliable network.          </p>
           </div>
         </motion.div>
       </div>

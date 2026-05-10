@@ -4,6 +4,7 @@ import Footer from "@/components/site/Footer";
 import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
+import aboutHeroBg from "@/assets/about-hero-bg.png";
 
 const posts = [
   {
@@ -37,25 +38,66 @@ const Blog = () => {
   return (
     <main className="relative min-h-screen overflow-x-hidden bg-background text-foreground">
       <Navbar />
-      <section className="pt-32 pb-20 container-px mx-auto">
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7 }}
-          className="max-w-3xl mb-14"
-        >
-          <span className="inline-block rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
-            Blog
-          </span>
-          <h1 className="mt-5 font-display text-4xl font-semibold tracking-tight md:text-6xl">
-            Insights from the <span className="text-gradient-hero">field.</span>
-          </h1>
-          <p className="mt-6 text-lg text-muted-foreground">
-            Engineering perspectives, industry updates, and technical deep-dives from our team.
-          </p>
+      <section  className="relative min-h-screen flex items-center overflow-hidden">
+        <motion.div className="absolute inset-0">
+          <img
+            src={aboutHeroBg}
+            alt="Telecom tower infrastructure at golden hour"
+            width={1920}
+            height={1080}
+            className="h-full w-full object-cover scale-110 opacity-80"
+          />
         </motion.div>
+        <div className="absolute inset-0 bg-gradient-to-b from-[hsl(217,67%,7%)/0.7] via-[hsl(217,67%,12%)/0.6] to-background" />
+        <div className="absolute inset-0 bg-gradient-to-r from-[hsl(217,67%,7%)/0.5] via-transparent to-transparent" />
 
-        <div className="grid gap-6 md:grid-cols-2">
+        <div className="container-px relative z-10 mx-auto pt-5 pb-20">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7 }}
+            className="max-w-3xl"
+          >
+            <span className="inline-block rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
+              About ATSS
+            </span>
+            <h1 className="mt-5 font-display text-4xl font-semibold text-[#091a3d] md:text-6xl">
+              <span className="whitespace-nowrap">Engineering infrastructure that{" "}</span><br />
+              <span className="relative inline-block">
+                <span className="text-yellow-500">Stands</span>
+                <svg className="absolute -bottom-2 left-0 w-full" viewBox="0 0 200 12" fill="none">
+                  <path d="M2 9 Q 50 2, 100 6 T 198 4" stroke="hsl(44, 65%, 52%)" strokeWidth="2.5" strokeLinecap="round" />
+                </svg>
+              </span>{" "}
+              <span className="text-[#091a3d] decoration-[#d4a017] decoration-2">
+                the test of time.
+              </span>
+            </h1>
+            <p className="mt-6 text-lg text-gray-500 leading-relaxed max-w-2xl">
+              At ATSS, we are dedicated to advancing the reliability and performance of wireless infrastructure
+              through cutting-edge engineering solutions. With a focus on innovation, precision, and client satisfaction,
+              we provide comprehensive services designed to meet the unique challenges of the wireless industry.
+            </p>
+          </motion.div>
+        </div>
+
+         <div
+    className="absolute bottom-0 left-0 w-full h-32 bg-gradient-to-r from-slate-900 via-blue-700 to-blue-500"
+    style={{
+      clipPath: "polygon(0 40%, 25% 70%, 55% 45%, 75% 55%, 100% 40%, 100% 100%, 0% 100%)",
+    }}
+  />
+
+  {/* White section below */}
+  <div
+    className="absolute bottom-0 left-0 w-full h-28 bg-white "
+    style={{
+      clipPath: "polygon(0 60%, 25% 80%, 55% 55%, 75% 65%, 100% 50%, 100% 100%, 0% 100%)",
+    }}
+  />
+  
+      </section>
+      <div className="grid gap-6 md:grid-cols-2">
           {posts.map((post, i) => (
             <motion.article
               key={post.title}
@@ -79,10 +121,10 @@ const Blog = () => {
             </motion.article>
           ))}
         </div>
-      </section>
       <Footer />
     </main>
   );
 };
 
 export default Blog;
+ 

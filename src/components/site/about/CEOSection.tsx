@@ -15,7 +15,7 @@ const CEOSection = () => {
             Leadership
           </span>
           <h2 className="font-display text-3xl font-semibold tracking-tight md:text-5xl">
-            Meet Our <span className="text-gradient-hero">CEO</span>
+            Meet Our <span className="text-gradient-hero">VISION LEAD</span>
           </h2>
           <p className="mt-6 text-base leading-relaxed text-muted-foreground max-w-xl">
             At ATSS, our vision is to redefine telecom infrastructure engineering

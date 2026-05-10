@@ -1,7 +1,13 @@
 import { motion } from "framer-motion";
 import { User } from "lucide-react";
 
-const team = [
+interface TeamMember {
+  name: string;
+  role: string;
+  bio: string;
+}
+
+const team: TeamMember[] = [
   {
     name: "Structural Analysis Engineer",
     role: "Engineering",
@@ -41,20 +47,27 @@ const TeamSection = () => {
       </motion.div>
 
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        {team.map((member, i) => (
+        {team.map((member: TeamMember, i: number) => (
           <motion.div
             key={member.name}
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6, delay: i * 0.1 }}
-            className="group relative rounded-2xl border border-border bg-card p-8 shadow-[var(--shadow-card)] transition-all duration-500 hover:shadow-[var(--shadow-elevated)] hover:border-primary/40 hover:-translate-y-2"
+            className="group relative rounded-2xl border border-border bg-card p-8 transition-all duration-500 hover:-translate-y-2 hover:border-primary/40"
+            style={{
+              boxShadow: "var(--shadow-card, 0 2px 8px rgba(0,0,0,0.08))",
+            }}
+            whileHover={{
+              boxShadow:
+                "0 20px 60px rgba(0, 0, 0, 0.45), 0 8px 24px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(99, 102, 241, 0.15)",
+            }}
           >
             <div className="flex flex-col items-center text-center">
-              <div className="grid h-20 w-20 place-items-center rounded-full bg-secondary text-muted-foreground/50 mb-5 transition-colors group-hover:bg-primary/10 group-hover:text-primary">
+              <div className="grid h-20 w-20 place-items-center rounded-full bg-secondary text-muted-foreground/50 mb-5 transition-all duration-500 group-hover:bg-primary/10 group-hover:text-primary group-hover:shadow-[0_8px_24px_rgba(0,0,0,0.3)]">
                 <User size={32} strokeWidth={1.5} />
               </div>
-              <h3 className="font-display text-lg font-semibold text-foreground">
+              <h3 className="font-display text-lg font-semibold text-foreground transition-colors duration-300 group-hover:text-primary">
                 {member.name}
               </h3>
               <span className="mt-1 inline-block rounded-full bg-accent/10 px-3 py-0.5 text-xs font-medium text-accent">
