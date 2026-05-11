@@ -1,3 +1,4 @@
+// src/pages/Contact.tsx
 import { useLenis } from "@/hooks/useLenis";
 import Navbar from "@/components/site/Navbar";
 import Footer from "@/components/site/Footer";
@@ -6,9 +7,53 @@ import { Mail, Phone, MapPin, ArrowUpRight } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 
+const GOOGLE_SHEET_URL = import.meta.env.VITE_GOOGLE_SHEET_URL as string;
+
+type Status = "idle" | "sending" | "error";
+
+interface FormData {
+  from_name: string;
+  company: string;
+  from_email: string;
+  message: string;
+}
+
 const Contact = () => {
   useLenis();
+
   const [submitted, setSubmitted] = useState(false);
+  const [status, setStatus] = useState<Status>("idle");
+  const [form, setForm] = useState<FormData>({
+    from_name: "",
+    company: "",
+    from_email: "",
+    message: "",
+  });
+
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setStatus("sending");
+
+    try {
+      await fetch(GOOGLE_SHEET_URL, {
+        method: "POST",
+        headers: { "Content-Type": "text/plain" },
+        body: JSON.stringify(form),
+      });
+
+      setStatus("idle");
+      setSubmitted(true);
+    } catch (err) {
+      console.error(err);
+      setStatus("error");
+    }
+  };
 
   return (
     <main className="relative min-h-screen overflow-x-hidden bg-background text-foreground">
@@ -43,55 +88,95 @@ const Contact = () => {
               <div className="py-16 text-center">
                 <div className="text-4xl mb-4">✓</div>
                 <h3 className="font-display text-2xl font-semibold">Thank you!</h3>
-                <p className="mt-2 text-muted-foreground">We'll be in touch within 24 hours.</p>
+                <p className="mt-2 text-muted-foreground">
+                  We'll be in touch within 24 hours.
+                </p>
               </div>
             ) : (
-              <form
-                onSubmit={(e) => { e.preventDefault(); setSubmitted(true); }}
-                className="space-y-5"
-              >
+              <form onSubmit={handleSubmit} className="space-y-5">
+
+                {/* Row: Name + Company */}
                 <div className="grid gap-5 sm:grid-cols-2">
                   <div>
-                    <label className="text-sm font-medium text-foreground">Name</label>
+                    <label className="text-sm font-medium text-foreground">
+                      Name
+                    </label>
                     <input
                       required
+                      name="from_name"
+                      value={form.from_name}
+                      onChange={handleChange}
                       className="mt-1.5 w-full rounded-xl border border-border bg-background px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
                       placeholder="Your name"
                     />
                   </div>
                   <div>
-                    <label className="text-sm font-medium text-foreground">Company</label>
+                    <label className="text-sm font-medium text-foreground">
+                      Company
+                    </label>
                     <input
+                      name="company"
+                      value={form.company}
+                      onChange={handleChange}
                       className="mt-1.5 w-full rounded-xl border border-border bg-background px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
                       placeholder="Company name"
                     />
                   </div>
                 </div>
+
+                {/* Email */}
                 <div>
-                  <label className="text-sm font-medium text-foreground">Email</label>
+                  <label className="text-sm font-medium text-foreground">
+                    Email
+                  </label>
                   <input
                     required
+                    name="from_email"
                     type="email"
+                    value={form.from_email}
+                    onChange={handleChange}
                     className="mt-1.5 w-full rounded-xl border border-border bg-background px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
                     placeholder="you@company.com"
                   />
                 </div>
+
+                {/* Message */}
                 <div>
-                  <label className="text-sm font-medium text-foreground">Message</label>
+                  <label className="text-sm font-medium text-foreground">
+                    Message
+                  </label>
                   <textarea
                     required
+                    name="message"
                     rows={5}
+                    value={form.message}
+                    onChange={handleChange}
                     className="mt-1.5 w-full rounded-xl border border-border bg-background px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 resize-none"
                     placeholder="Tell us about your project..."
                   />
                 </div>
-                <Button type="submit" className="w-full rounded-xl py-3">
-                  Send Message
+
+                {/* Error message */}
+                {status === "error" && (
+                  <p className="text-sm text-destructive">
+                    Something went wrong. Please try again.
+                  </p>
+                )}
+
+                {/* Submit */}
+                <Button
+                  type="submit"
+                  disabled={status === "sending"}
+                  className="w-full rounded-xl py-3"
+                >
+                  {status === "sending" ? "Sending…" : "Send Message"}
                 </Button>
+
               </form>
             )}
           </motion.div>
 
+          {/* ── Right column — unchanged ── */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -99,13 +184,16 @@ const Contact = () => {
             className="space-y-6"
           >
             {[
-              { icon: Mail, label: "Email", value: "engineering@atss.com" },
-              { icon: Phone, label: "Phone", value: "+1 (555) 234-5678" },
+              { icon: Mail,   label: "Email",  value: "engineering@atss.com" },
+              { icon: Phone,  label: "Phone",  value: "+1 (555) 234-5678" },
               { icon: MapPin, label: "Office", value: "1200 Tower Drive, Suite 400\nDallas, TX 75201" },
             ].map((c) => {
               const Icon = c.icon;
               return (
-                <div key={c.label} className="flex gap-4 rounded-2xl border border-border bg-card p-6 shadow-[var(--shadow-card)]">
+                <div
+                  key={c.label}
+                  className="flex gap-4 rounded-2xl border border-border bg-card p-6 shadow-[var(--shadow-card)]"
+                >
                   <div className="grid h-12 w-12 shrink-0 place-items-center rounded-xl bg-primary/10 text-primary">
                     <Icon size={20} />
                   </div>
@@ -121,7 +209,7 @@ const Contact = () => {
               <h3 className="font-display text-lg font-semibold">Response Timeline</h3>
               <div className="mt-4 space-y-3">
                 {[
-                  { k: "Avg. response", v: "< 24 hours" },
+                  { k: "Avg. response",   v: "< 24 hours" },
                   { k: "Scoped proposal", v: "3 business days" },
                   { k: "Project kickoff", v: "1 week" },
                 ].map((row) => (
@@ -135,6 +223,7 @@ const Contact = () => {
           </motion.div>
         </div>
 
+        {/* ── Map section — unchanged ── */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
