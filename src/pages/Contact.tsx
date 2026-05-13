@@ -7,7 +7,7 @@ import { Mail, Phone, MapPin, ArrowUpRight } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 
-const GOOGLE_SHEET_URL = import.meta.env.VITE_GOOGLE_SHEET_URL as string;
+const CONTACT_API_URL = import.meta.env.VITE_CONTACT_API_URL || "/api/send-email";
 
 type Status = "idle" | "sending" | "error";
 
@@ -41,11 +41,21 @@ const Contact = () => {
     setStatus("sending");
 
     try {
-      await fetch(GOOGLE_SHEET_URL, {
+      const response = await fetch(CONTACT_API_URL, {
         method: "POST",
-        headers: { "Content-Type": "text/plain" },
-        body: JSON.stringify(form),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: form.from_name,
+          company: form.company,
+          email: form.from_email,
+          message: form.message,
+        }),
       });
+
+      if (!response.ok) {
+        const payload = await response.json().catch(() => ({}));
+        throw new Error(payload?.error || "Failed to send message");
+      }
 
       setStatus("idle");
       setSubmitted(true);
