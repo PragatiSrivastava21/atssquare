@@ -1,18 +1,18 @@
 import { motion } from "framer-motion";
 import { Activity, Building2, Antenna, Layers, Wind, Bot, ArrowUpRight } from "lucide-react";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import heroTower from "@/assets/hero-tower.jpg";
 import networkAerial from "@/assets/network-aerial.jpg";
 import towerSlide1 from "@/assets/tower-slide-1.jpg";
 import towerSlide2 from "@/assets/tower-slide-2.jpg";
-import towerSlide3 from "@/assets/tower-slide-3.jpg";
-import wireframeTower from "@/assets/wireframe-tower.jpg";
 import services1 from "@/assets/services-1.jpg";
 import services2 from "@/assets/services-2.png";
 import services3 from "@/assets/services-3.png";
 import services4 from "@/assets/services-4.png";
 import services5 from "@/assets/services-5.png";
-import services6 from "@/assets/services-6.png"
+import services6 from "@/assets/services-6.png";
+
 const services = [
   {
     icon: Activity,
@@ -25,7 +25,7 @@ const services = [
   },
   {
     icon: Building2,
-    title: "Structural Modification Design, Drawings  Construction Support",
+    title: "Structural Modification Design, Drawings & Construction Support",
     desc: "Self-supporting, monopole and guyed designs engineered for terrain, climate and growth.",
     details:
       "ATSS offers end-to-end structural modification, design, and construction support services for existing telecom infrastructure. This includes strengthening of towers and mounts, retrofitting for additional equipment, and design support for construction and erection activities. Our engineering teams work closely with field and construction teams to ensure safe implementation, constructability, and compliance with design intent. AI-assisted planning and documentation help streamline execution, reduce downtime, and improve overall project efficiency.",
@@ -34,10 +34,10 @@ const services = [
   },
   {
     icon: Antenna,
-    title: "AI- Driven Mobile Application Services",
+    title: "AI-Driven Mobile Application Services",
     desc: "Mount capacity, modification design and reinforcement for 5G and mmWave equipment.",
     details:
-      "ATSS provides a powerful AI-driven mobile application that digitally integrates field inspections, engineering analysis, and reporting. The app supports tower and mount inspections through guided workflows, intelligent checklists, and AI-based image recognition for defect identification.Key features include auto generated COAX layouts based on site data, azimuths, and equipment configuration, real-time progress tracking, and automated data validation. Multi-language, one-click report generation ensures fast, standardized, and client-ready deliverables. The platform creates a seamless connection between on-site data collection and back-end engineering, enabling true end-to-end digital tower management.",
+      "ATSS provides a powerful AI-driven mobile application that digitally integrates field inspections, engineering analysis, and reporting. The app supports tower and mount inspections through guided workflows, intelligent checklists, and AI-based image recognition for defect identification. Key features include auto generated COAX layouts based on site data, azimuths, and equipment configuration, real-time progress tracking, and automated data validation. Multi-language, one-click report generation ensures fast, standardized, and client-ready deliverables.",
     code: "03",
     image: towerSlide1,
   },
@@ -46,7 +46,7 @@ const services = [
     title: "New Tower & Mount Design",
     desc: "Geotechnical-driven foundation review, retrofit and uplift / overturning assessment.",
     details:
-      "ATSS specializes in the design of new telecom towers and antenna mounting structures tailored to site-specific and client-specific requirements. Our designs emphasize structural efficiency, constructability, durability, and future upgrade flexibility. By combining intelligent design automation with engineering expertise, we deliver optimized solutions that reduce material usage, improve constructability, and support long-term network expansion",
+      "ATSS specializes in the design of new telecom towers and antenna mounting structures tailored to site-specific and client-specific requirements. Our designs emphasize structural efficiency, constructability, durability, and future upgrade flexibility. By combining intelligent design automation with engineering expertise, we deliver optimized solutions that reduce material usage, improve constructability, and support long-term network expansion.",
     code: "04",
     image: towerSlide2,
   },
@@ -83,6 +83,7 @@ const services = [
     desc: "Advanced structural simulation to validate stress, deflection and fatigue performance under load.",
     details:
       "ATSS offers advanced Finite Element Analysis (FEA) services to evaluate complex structural behavior that cannot be accurately captured using conventional methods. FEA is applied to critical components such as bolted and welded connections, base plates, gussets, brackets, and special structural elements. Through detailed stress, strain, deformation, and fatigue analysis, we help optimize designs, validate safety margins, and improve structural performance under real-world loading conditions.",
+    link: "/services/fea",
     code: "08",
     image: services6,
   },
@@ -91,7 +92,8 @@ const services = [
     title: "Thermal and Heat Analysis",
     desc: "Thermal mapping and heat transfer assessment for joints, coatings, and high-temperature load cases.",
     details:
-      "Our thermal and heat analysis services assess the impact of temperature variations and heat generation on telecom structures and equipment. This includes evaluating thermal expansion effects, material performance in extreme climates, and heat dissipation from active telecom equipment such as radios, RRUs, and power units. AI-driven simulations help predict long-term behavior, reduce thermal stress risks, and ensure safe operation in diverse environmental conditions",
+      "Our thermal and heat analysis services assess the impact of temperature variations and heat generation on telecom structures and equipment. This includes evaluating thermal expansion effects, material performance in extreme climates, and heat dissipation from active telecom equipment such as radios, RRUs, and power units. AI-driven simulations help predict long-term behavior, reduce thermal stress risks, and ensure safe operation in diverse environmental conditions.",
+    link: "/services/thermal",
     code: "09",
     image: heroTower,
   },
@@ -100,7 +102,7 @@ const services = [
     title: "SolidWorks 3D Structural Modelling",
     desc: "Parametric 3D models and assemblies for detailed design review, fabrication, and BIM coordination.",
     details:
-      "We offer SolidWorks-based 3D modeling services for telecom towers, mounts, and structural components. Detailed 3D models improve design visualization, coordination, and clash detection while supporting fabrication accuracy. These models are also used for advanced analysis, simulation, and digital documentation, enabling smarter engineering decisions and improved project execution",
+      "We offer SolidWorks-based 3D modeling services for telecom towers, mounts, and structural components. Detailed 3D models improve design visualization, coordination, and clash detection while supporting fabrication accuracy. These models are also used for advanced analysis, simulation, and digital documentation, enabling smarter engineering decisions and improved project execution.",
     code: "10",
     image: networkAerial,
   },
@@ -109,7 +111,8 @@ const services = [
     title: "Corrosion Analysis & Structural Repairs",
     desc: "Inspection-driven repair plans to restore strength, prevent failure, and extend tower service life.",
     details:
-      "ATSS provides corrosion assessment and mitigation services to evaluate material degradation caused by environmental exposure, aging, and operational conditions. Our corrosion analysis includes visual inspections, section loss evaluation, coating condition assessment, and remaining life estimation. Based on findings, we develop structural modification and strengthening solutions such as member replacement, reinforcement, protective coating systems, and corrosion-resistant design upgrades to extend asset life and ensure continued structural safety",
+      "ATSS provides corrosion assessment and mitigation services to evaluate material degradation caused by environmental exposure, aging, and operational conditions. Our corrosion analysis includes visual inspections, section loss evaluation, coating condition assessment, and remaining life estimation. Based on findings, we develop structural modification and strengthening solutions such as member replacement, reinforcement, protective coating systems, and corrosion-resistant design upgrades to extend asset life and ensure continued structural safety.",
+    link: "/services/corrosion-analysis",
     code: "11",
     image: services5,
   },
@@ -117,6 +120,7 @@ const services = [
 
 const Services = () => {
   const [active, setActive] = useState<number | null>(null);
+  const navigate = useNavigate();
 
   return (
     <section className="relative py-16 md:py-24 bg-background">
@@ -125,6 +129,8 @@ const Services = () => {
           {services.map((s, i) => {
             const Icon = s.icon;
             const isActive = active === i;
+            const hasLink = "link" in s && !!s.link;
+
             return (
               <motion.article
                 key={s.title}
@@ -162,9 +168,21 @@ const Services = () => {
                     <motion.div
                       initial={{ opacity: 0, height: 0 }}
                       animate={{ opacity: 1, height: "auto" }}
-                      className="relative mt-5 border-t border-border pt-5 text-sm text-white/80"
+                      className="relative mt-5 border-t border-white/20 pt-5 text-sm text-white/80"
                     >
-                      {s.details}
+                      <p>{s.details}</p>
+
+                      {/* Detail page link — only renders for services that have a link field */}
+                      {hasLink && (
+                        <button
+                          type="button"
+                          onClick={() => navigate((s as typeof s & { link: string }).link)}
+                          className="mt-4 inline-flex items-center gap-1.5 font-medium text-yellow-400 underline-offset-4 transition-colors hover:text-yellow-300 hover:underline"
+                        >
+                          Learn more about this service
+                          <ArrowUpRight size={14} />
+                        </button>
+                      )}
                     </motion.div>
                   )}
 

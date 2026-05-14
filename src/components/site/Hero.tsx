@@ -4,8 +4,8 @@ import { Link } from "react-router-dom";
 import { ArrowRight, Radio } from "lucide-react";
 import t1 from "@/assets/2.png";
 import t2 from "@/assets/towerr.png";
-import t3 from "@/assets/tower-slide-2.jpg";
-import t4 from "@/assets/tower-slide-4.jpg";
+import t3 from "@/assets/tower.png";
+import t4 from "@/assets/1.jpeg";
 
 const slides = [
   {

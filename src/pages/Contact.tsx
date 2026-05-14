@@ -184,9 +184,9 @@ const Contact = () => {
             className="space-y-6"
           >
             {[
-              { icon: Mail,   label: "Email",  value: "engineering@atss.com" },
-              { icon: Phone,  label: "Phone",  value: "+1 (555) 234-5678" },
-              { icon: MapPin, label: "Office", value: "1200 Tower Drive, Suite 400\nDallas, TX 75201" },
+              { icon: Mail,   label: "Email",  value: "info@atssquare.com" },
+              { icon: Phone,  label: "Phone",  value: "+1 (574) 540-9079" },
+              { icon: MapPin, label: "Office", value: "1527 Waterleaf Lane, Delray Beach, FL-33446" },
             ].map((c) => {
               const Icon = c.icon;
               return (
@@ -240,11 +240,12 @@ const Contact = () => {
                 Our <span className="text-gradient-hero">Location</span>
               </h2>
               <p className="mt-2 text-muted-foreground max-w-md">
-                Visit our headquarters in Dallas, or reach out to schedule a site visit anywhere in the region.
+                Visit our headquarters Waterleaf Lane
+Waterleaf Ln, Florida 33446, USA, or reach out to schedule a site visit anywhere in the region.
               </p>
             </div>
             <a
-              href="https://maps.google.com/?q=1200+Tower+Drive,+Dallas,+TX+75201"
+              href="https://maps.google.com/?q=1527+Waterleaf+Lane,+Delray+Beach,+FL+33446"
               target="_blank"
               rel="noreferrer"
               className="inline-flex items-center gap-2 rounded-xl bg-card border border-border px-5 py-2.5 text-sm font-medium text-foreground shadow-[var(--shadow-card)] hover:shadow-[var(--shadow-elevated)] hover:-translate-y-0.5 transition-all duration-300 shrink-0"

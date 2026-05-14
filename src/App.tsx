@@ -14,6 +14,9 @@ import Privacy from "./pages/Privacy";
 import Faqs from "./pages/Faqs";
 import Terms from "./pages/Terms";
 import NotFound from "./pages/NotFound";
+ import CorrosionService from "@/components/site/corrosionservice";
+ import FeaService from "@/components/site/feaservice";
+import ThermalService from "@/components/site/thermalservice";
 
 const queryClient = new QueryClient();
 
@@ -25,6 +28,11 @@ const App = () => (
       <BrowserRouter>
         <ScrollToTop />
         <Routes>
+         
+
+<Route path="/services/corrosion-analysis" element={<CorrosionService />} />
+<Route path="/services/fea" element={<FeaService />} />
+<Route path="/services/thermal" element={<ThermalService />} />
           <Route path="/" element={<Index />} />
           <Route path="/about" element={<About />} />
           <Route path="/services" element={<ServicesPage />} />

@@ -29,8 +29,13 @@ const Navbar = () => {
         <Link to="/" className="group flex items-center gap-2.5">
           <img src="/ats2-logo.png" alt="ATS² Logo" className="h-12 md:h-16 object-contain" />
           <div className="hidden md:flex flex-col">
-            <h1 className="text-sm md:text-base font-bold text-blue-900 leading-tight">Advanced Tower Structural Solution</h1>
-            <p className="text-xs md:text-sm text-blue-700">Engineering Simplified</p>
+           <h1 className="text-lg md:text-2xl font-extrabold tracking-tight leading-none bg-gradient-to-r from-blue-950 via-blue-800 to-blue-600 bg-clip-text text-transparent drop-shadow-sm">
+  Advanced Tower Structural Solutions
+</h1>
+
+<p className="mt-1 text-sm md:text-base font-semibold tracking-wide uppercase text-blue-700">
+  Engineering Simplified
+</p>
           </div>
         </Link>
 

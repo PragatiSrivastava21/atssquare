@@ -1,12 +1,19 @@
 import { motion } from "framer-motion";
-import { Database, LineChart, Cpu, Settings2, PackageCheck } from "lucide-react";
+import { Database, LineChart, Cpu, Settings2, PackageCheck, ShieldCheck } from "lucide-react";
 
 const steps = [
-  { icon: Database, title: "Data Collection", desc: "On-site survey, drone photogrammetry & LiDAR scans capture every asset." },
-  { icon: LineChart, title: "Analysis", desc: "Structural mathematicians model loads against TIA-222 and local codes." },
-  { icon: Cpu, title: "Simulation", desc: "FEA & CFD reveal wind, seismic and fatigue performance under 50-year scenarios." },
+{
+  icon: Database,
+  title: "Data Collection",
+  desc: `Collecting comprehensive data from tower owners, clients, and tower manufacturers
+  , including technical specifications, structural details, site conditions, and high-resolution photographs.
+   This information helps ensure accurate analysis, efficient project planning, and reliable engineering assessments tailored to real-world tower infrastructure requirements.`,
+},
+  { icon: LineChart, title: "Analysis", desc: "Structural engineering model these structure in the commonly used industry software using TIA-222 amd local codes" },
+  { icon: Cpu, title: "Simulation", desc: "Finite Element Analysis (FEA) & Computational Fluid Dynamics (CFD) reveal wind, seismic and fatigue performance under 50-year scenarios." },
   { icon: Settings2, title: "Optimization", desc: "We engineer the leanest retrofit — minimum steel, maximum integrity." },
-  { icon: PackageCheck, title: "Delivery", desc: "Stamped drawings, BOM and digital twin handed to your construction team." },
+  { icon: ShieldCheck, title: "Rigorous Quality Check", desc: "Every job performed goes through our quality team to perform detail, check of calculation." },
+  { icon: PackageCheck, title: "Delivery", desc: "Stamped drawings, BOM  handed to your construction team." },
 ];
 
 const Process = () => {
