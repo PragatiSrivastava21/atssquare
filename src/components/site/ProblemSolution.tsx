@@ -524,16 +524,16 @@ export default function TowerMap() {
         <div style={styles.mapWrap}>
           <MapContainer
             style={{ width: "100%", height: "100%" }}
-            zoomControl={true}
-            scrollWheelZoom={true}
           >
             <SetInitialView />
             {/* CARTO Voyager tiles — built on OpenStreetMap, no API key needed */}
             <TileLayer
-              attribution="\u00a9 OpenStreetMap contributors \u00a9 CARTO"
-              url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
-              subdomains={["a", "b", "c", "d"]}
-              maxZoom={19}
+              {...({
+                url: "https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png",
+                attribution: "&copy; OpenStreetMap contributors &copy; CARTO",
+                subdomains: ["a", "b", "c", "d"],
+                maxZoom: 19,
+              } as any)}
             />
 
             <FlyTo tower={selected} />
@@ -542,10 +542,10 @@ export default function TowerMap() {
               <Marker
                 key={tower.id}
                 position={[tower.lat, tower.lng] as [number, number]}
-                icon={makeIcon(tower, selected?.id === tower.id)}
                 eventHandlers={{
                   click: () => setSelected(tower),
                 }}
+                {...({ icon: makeIcon(tower, selected?.id === tower.id) } as any)}
               >
                 <Popup>
                   <div style={{
