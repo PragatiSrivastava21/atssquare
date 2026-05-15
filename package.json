@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "predev": "npx kill-port 4174 8080 || true",
+    "predev": "npx --yes kill-port 4174 8080 || true",
     "dev": "concurrently -k \"vite\" \"node server/index.js\"",
     "send:first-email": "node --experimental-fetch scripts/send-first-email.js",
     "start:server": "node server/index.js",
