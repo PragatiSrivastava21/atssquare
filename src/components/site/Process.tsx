@@ -9,11 +9,31 @@ const steps = [
   , including technical specifications, structural details, site conditions, and high-resolution photographs.
    This information helps ensure accurate analysis, efficient project planning, and reliable engineering assessments tailored to real-world tower infrastructure requirements.`,
 },
-  { icon: LineChart, title: "Analysis", desc: "Structural engineering model these structure in the commonly used industry software using TIA-222 amd local codes" },
-  { icon: Cpu, title: "Simulation", desc: "Finite Element Analysis (FEA) & Computational Fluid Dynamics (CFD) reveal wind, seismic and fatigue performance under 50-year scenarios." },
-  { icon: Settings2, title: "Optimization", desc: "We engineer the leanest retrofit — minimum steel, maximum integrity." },
-  { icon: ShieldCheck, title: "Rigorous Quality Check", desc: "Every job performed goes through our quality team to perform detail, check of calculation." },
-  { icon: PackageCheck, title: "Delivery", desc: "Stamped drawings, BOM  handed to your construction team." },
+ {
+  icon: LineChart,
+  title: "Analysis",
+  desc: `Structural engineering models are developed using widely adopted industry-standard software platforms to analyze and validate tower performance under various loading conditions. The structures are designed and assessed in accordance with TIA-222 standards and applicable local codes, ensuring structural safety, compliance, reliability, and optimized performance for real-world telecom infrastructure environments.`
+},
+  {
+  icon: Cpu,
+  title: "Simulation",
+  desc: `Advanced Finite Element Analysis (FEA) and Computational Fluid Dynamics (CFD) simulations are performed to evaluate structural behavior under extreme wind, seismic, and fatigue loading conditions. These studies ensure long-term structural reliability, stability, and performance across demanding 50-year design life scenarios.`
+},
+{
+  icon: Settings2,
+  title: "Optimization",
+  desc: `We engineer highly optimized retrofit solutions that achieve the ideal balance between minimum steel utilization and maximum structural integrity. Our approach reduces project costs, improves constructability, and enhances the long-term performance of existing telecom infrastructure.`
+},
+{
+  icon: ShieldCheck,
+  title: "Rigorous Quality Check",
+  desc: `Every project undergoes a comprehensive quality assurance process carried out by our dedicated engineering and quality control team. Detailed calculation reviews, structural validations, and compliance checks are performed to ensure accuracy, safety, and adherence to industry standards.`
+},
+{
+  icon: PackageCheck,
+  title: "Delivery",
+  desc: `Professionally stamped engineering drawings, fabrication details, and complete Bills of Materials (BOM) are prepared and delivered to your construction team for seamless execution. This ensures accurate implementation, efficient coordination, and compliance with project requirements and engineering standards.`
+},
 ];
 
 const Process = () => {
