@@ -30,7 +30,7 @@ const CEOSection = () => {
             <div className="h-px w-12 bg-accent" />
             <div>
               <p className="font-display text-lg font-semibold text-foreground">
-                Chief Executive Officer
+               Nitesh Ahuja
               </p>
               <p className="text-sm text-muted-foreground">
                 Advanced Tower Structural Solutions

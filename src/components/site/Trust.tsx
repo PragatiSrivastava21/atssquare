@@ -1,13 +1,9 @@
 import { motion } from "framer-motion";
 
 const logos = [
-  "SBA COMMUNICATIONS",
-  "GPD",
-  "ALM BOY",
-  "ALL PRO",
-  "ALL FASTENER",
-  "VERTICAL BRIDGE",
-  
+  "TOWER OWNERS",
+  "TOWER MANUFACTURERS",
+ "MOUNT MANUFACTURERS"
 ];
 
 const Trust = () => {

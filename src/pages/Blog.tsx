@@ -1,10 +1,12 @@
 import { useLenis } from "@/hooks/useLenis";
 import Navbar from "@/components/site/Navbar";
 import Footer from "@/components/site/Footer";
+
 import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
-import aboutHeroBg from "@/assets/about-hero-bg.png";
+import blogHeroBg from "@/assets/hero-tower.jpg";
+import BlogPostsGrid from "@/components/site/blogtxt";
 
 const posts = [
   {
@@ -41,7 +43,7 @@ const Blog = () => {
       <section  className="relative min-h-screen flex items-center overflow-hidden">
         <motion.div className="absolute inset-0">
           <img
-            src={aboutHeroBg}
+            src={blogHeroBg}
             alt="Telecom tower infrastructure at golden hour"
             width={1920}
             height={1080}
@@ -58,25 +60,23 @@ const Blog = () => {
             transition={{ duration: 0.7 }}
             className="max-w-3xl"
           >
-            <span className="inline-block rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
-              About ATSS
+            <span className="inline-block rounded-full bg-white px-3 py-1 text-xs font-medium text-primary">
+             Blog
             </span>
-            <h1 className="mt-5 font-display text-4xl font-semibold text-[#091a3d] md:text-6xl">
-              <span className="whitespace-nowrap">Engineering infrastructure that{" "}</span><br />
+            <h1 className="mt-5 font-display text-4xl font-semibold text-white md:text-6xl">
+              <span className="whitespace-nowrap">Insights{" "}</span><br />
               <span className="relative inline-block">
-                <span className="text-yellow-500">Stands</span>
+                <span className="text-yellow-500">From</span>
                 <svg className="absolute -bottom-2 left-0 w-full" viewBox="0 0 200 12" fill="none">
                   <path d="M2 9 Q 50 2, 100 6 T 198 4" stroke="hsl(44, 65%, 52%)" strokeWidth="2.5" strokeLinecap="round" />
                 </svg>
               </span>{" "}
-              <span className="text-[#091a3d] decoration-[#d4a017] decoration-2">
-                the test of time.
+              <span className="text-white decoration-[#d4a017] decoration-2">
+                the field.
               </span>
             </h1>
-            <p className="mt-6 text-lg text-gray-500 leading-relaxed max-w-2xl">
-              At ATSS, we are dedicated to advancing the reliability and performance of wireless infrastructure
-              through cutting-edge engineering solutions. With a focus on innovation, precision, and client satisfaction,
-              we provide comprehensive services designed to meet the unique challenges of the wireless industry.
+            <p className="mt-6 text-lg text-whiteleading-relaxed text-white max-w-2xl">
+              Engineering perspective,industry updates, and technical deep-dives from our team.
             </p>
           </motion.div>
         </div>
@@ -97,30 +97,8 @@ const Blog = () => {
   />
   
       </section>
-      <div className="grid gap-6 md:grid-cols-2">
-          {posts.map((post, i) => (
-            <motion.article
-              key={post.title}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6, delay: i * 0.1 }}
-              className="group rounded-2xl border border-border bg-card p-7 shadow-[var(--shadow-card)] hover:shadow-[var(--shadow-elevated)] transition-all hover:-translate-y-1"
-            >
-              <div className="flex items-center gap-3 text-xs text-muted-foreground">
-                <span>{post.date}</span>
-                <span className="rounded-full bg-primary/10 px-2 py-0.5 text-primary font-medium">{post.tag}</span>
-              </div>
-              <h3 className="mt-4 font-display text-xl font-semibold group-hover:text-primary transition-colors">
-                {post.title}
-              </h3>
-              <p className="mt-3 text-sm text-muted-foreground leading-relaxed">{post.excerpt}</p>
-              <div className="mt-5 flex items-center gap-2 text-sm font-medium text-primary">
-                Read more <ArrowRight size={14} />
-              </div>
-            </motion.article>
-          ))}
-        </div>
+<BlogPostsGrid/>
+
       <Footer />
     </main>
   );

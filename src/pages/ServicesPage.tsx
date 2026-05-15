@@ -20,7 +20,7 @@ const ServicesPage = () => {
             alt="Telecom tower infrastructure at golden hour"
             width={1920}
             height={1080}
-            className="h-full w-full object-cover scale-110 opacity-80"
+            className="h-full w-full object-cover scale-110 opacity-50"
           />
         </motion.div>
         <div className="absolute inset-0 bg-gradient-to-b from-[hsl(217,67%,7%)/0.7] via-[hsl(217,67%,12%)/0.6] to-background" />
@@ -48,7 +48,7 @@ const ServicesPage = () => {
                 for wireless infrastructure.
               </span>
             </h1>
-            <p className="mt-6 text-lg text-gray-900 leading-relaxed max-w-2xl">
+            <p className="mt-6 text-lg text-[#091a3d] leading-relaxed max-w-2xl">
               Six disciplines, one team. From the bolt to the byte - we engineer every layer that keeps networks online.
             </p>
           </motion.div>

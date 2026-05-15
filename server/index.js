@@ -19,6 +19,7 @@ app.post("/api/send-email", async (req, res) => {
   const from = process.env.RESEND_FROM_EMAIL || "onboarding@resend.dev";
 
   if (!apiKey) {
+    console.error("Missing RESEND_API_KEY");
     res.status(500).json({ error: "Missing RESEND_API_KEY" });
     return;
   }

@@ -1,545 +1,821 @@
-import { motion, useMotionValue, useSpring } from "framer-motion";
-import { useEffect, useState, useRef } from "react";
-import staticMap from "@/assets/map.jpeg";
+// TowerMap.tsx
+// Dependencies: npm install leaflet react-leaflet @types/leaflet recharts
 
-type PinStatus = "ok" | "warn" | "critical";
+import { useState, useEffect } from "react";
+import { MapContainer, TileLayer, Marker, Popup, useMap, MapContainerProps } from "react-leaflet";
+import type { Map as LeafletMap } from "leaflet";
+import { PieChart, Pie, Cell, Tooltip } from "recharts";
+import L from "leaflet";
+import "leaflet/dist/leaflet.css";
 
-interface TowerPinProps {
+// ── Fix Leaflet default marker icons broken by bundlers ────────────────────
+// (Vite / webpack can't resolve the default marker PNG paths at runtime)
+delete (L.Icon.Default.prototype as any)._getIconUrl;
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png",
+  iconUrl:       "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
+  shadowUrl:     "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
+});
+
+// ── Types ──────────────────────────────────────────────────────────────────
+interface WorkItem {
   label: string;
-  status?: PinStatus;
+  pct: number;
+  color: string;
 }
 
-interface MetricChipProps {
-  value: number | string;
-  unit: string;
-  label: string;
-  color?: string;
-  bgColor?: string;
-  trend?: "up" | "down" | "stable";
+interface Tower {
+  id: number;
+  state: string;
+  lat: number;
+  lng: number;
+  name: string;
+  location: string;
+  height: string;
+  year: number;
+  team: number;
+  duration: string;
+  status: "completed" | "ongoing";
+  work: WorkItem[];
 }
 
-// ─── Tower Pin ─────────────────────────────────────────────────────────────
-const TowerPin: React.FC<TowerPinProps> = ({ label, status = "ok" }) => {
-  const colors: Record<PinStatus, { dot: string; ring: string; line: string; glow: string }> = {
-    ok: {
-      dot: "bg-blue-400",
-      ring: "rgba(59,130,246,0.3)",
-      line: "bg-blue-400",
-      glow: "0 0 12px rgba(59,130,246,0.8)",
-    },
-    warn: {
-      dot: "bg-amber-400",
-      ring: "rgba(245,158,11,0.3)",
-      line: "bg-amber-400",
-      glow: "0 0 12px rgba(245,158,11,0.8)",
-    },
-    critical: {
-      dot: "bg-red-500",
-      ring: "rgba(239,68,68,0.3)",
-      line: "bg-red-500",
-      glow: "0 0 12px rgba(239,68,68,0.9)",
-    },
-  };
+// ── Data ───────────────────────────────────────────────────────────────────
+const towers: Tower[] = [
+  {
+    id: 1, state: "Alabama", lat: 33.5186, lng: -86.8104,
+    name: "Tower Alpha", location: "Birmingham, AL", height: "180 m",
+    year: 2021, team: 8, duration: "6 wks", status: "completed",
+    work: [
+      { label: "Structural", pct: 38, color: "#185FA5" },
+      { label: "Foundation", pct: 22, color: "#1D9E75" },
+      { label: "Fatigue",    pct: 18, color: "#BA7517" },
+      { label: "Antenna",    pct: 14, color: "#993C1D" },
+      { label: "FEA/CFD",   pct: 8,  color: "#534AB7" },
+    ],
+  },
+  {
+    id: 2, state: "Connecticut", lat: 41.7658, lng: -72.6851,
+    name: "Tower Beta", location: "Hartford, CT", height: "215 m",
+    year: 2022, team: 11, duration: "9 wks", status: "completed",
+    work: [
+      { label: "Structural", pct: 30, color: "#185FA5" },
+      { label: "FEA/CFD",   pct: 28, color: "#534AB7" },
+      { label: "Foundation", pct: 20, color: "#1D9E75" },
+      { label: "Antenna",    pct: 12, color: "#993C1D" },
+      { label: "Fatigue",    pct: 10, color: "#BA7517" },
+    ],
+  },
+  {
+    id: 3, state: "Georgia", lat: 33.749, lng: -84.388,
+    name: "Tower Gamma", location: "Atlanta, GA", height: "145 m",
+    year: 2023, team: 6, duration: "4 wks", status: "ongoing",
+    work: [
+      { label: "Structural", pct: 45, color: "#185FA5" },
+      { label: "Antenna",    pct: 25, color: "#993C1D" },
+      { label: "Foundation", pct: 18, color: "#1D9E75" },
+      { label: "Fatigue",    pct: 12, color: "#BA7517" },
+    ],
+  },
+  {
+    id: 4, state: "Indiana", lat: 39.7684, lng: -86.1581,
+    name: "Tower Delta", location: "Indianapolis, IN", height: "160 m",
+    year: 2022, team: 9, duration: "7 wks", status: "completed",
+    work: [
+      { label: "Structural", pct: 32, color: "#185FA5" },
+      { label: "Foundation", pct: 26, color: "#1D9E75" },
+      { label: "FEA/CFD",   pct: 22, color: "#534AB7" },
+      { label: "Antenna",    pct: 12, color: "#993C1D" },
+      { label: "Fatigue",    pct: 8,  color: "#BA7517" },
+    ],
+  },
+  {
+    id: 5, state: "Iowa", lat: 41.5868, lng: -93.625,
+    name: "Tower Epsilon", location: "Des Moines, IA", height: "195 m",
+    year: 2023, team: 13, duration: "11 wks", status: "ongoing",
+    work: [
+      { label: "FEA/CFD",   pct: 30, color: "#534AB7" },
+      { label: "Structural", pct: 28, color: "#185FA5" },
+      { label: "Foundation", pct: 22, color: "#1D9E75" },
+      { label: "Fatigue",    pct: 12, color: "#BA7517" },
+      { label: "Antenna",    pct: 8,  color: "#993C1D" },
+    ],
+  },
+  {
+    id: 6, state: "Kentucky", lat: 38.2527, lng: -85.7585,
+    name: "Tower Zeta", location: "Louisville, KY", height: "170 m",
+    year: 2021, team: 7, duration: "5 wks", status: "completed",
+    work: [
+      { label: "Structural", pct: 40, color: "#185FA5" },
+      { label: "Fatigue",    pct: 24, color: "#BA7517" },
+      { label: "Antenna",    pct: 20, color: "#993C1D" },
+      { label: "Foundation", pct: 16, color: "#1D9E75" },
+    ],
+  },
+  {
+    id: 7, state: "Maine", lat: 43.6615, lng: -70.2553,
+    name: "Tower Eta", location: "Portland, ME", height: "200 m",
+    year: 2024, team: 10, duration: "8 wks", status: "ongoing",
+    work: [
+      { label: "FEA/CFD",   pct: 35, color: "#534AB7" },
+      { label: "Structural", pct: 30, color: "#185FA5" },
+      { label: "Foundation", pct: 20, color: "#1D9E75" },
+      { label: "Antenna",    pct: 15, color: "#993C1D" },
+    ],
+  },
+  {
+    id: 8, state: "Maryland", lat: 39.2904, lng: -76.6122,
+    name: "Tower Theta", location: "Baltimore, MD", height: "155 m",
+    year: 2022, team: 8, duration: "6 wks", status: "completed",
+    work: [
+      { label: "Structural", pct: 35, color: "#185FA5" },
+      { label: "Foundation", pct: 25, color: "#1D9E75" },
+      { label: "FEA/CFD",   pct: 20, color: "#534AB7" },
+      { label: "Fatigue",    pct: 12, color: "#BA7517" },
+      { label: "Antenna",    pct: 8,  color: "#993C1D" },
+    ],
+  },
+  {
+    id: 9, state: "Michigan", lat: 42.3314, lng: -83.0458,
+    name: "Tower Iota", location: "Detroit, MI", height: "188 m",
+    year: 2023, team: 9, duration: "7 wks", status: "ongoing",
+    work: [
+      { label: "Structural", pct: 33, color: "#185FA5" },
+      { label: "FEA/CFD",   pct: 27, color: "#534AB7" },
+      { label: "Foundation", pct: 22, color: "#1D9E75" },
+      { label: "Antenna",    pct: 18, color: "#993C1D" },
+    ],
+  },
+  {
+    id: 10, state: "Minnesota", lat: 44.9778, lng: -93.265,
+    name: "Tower Kappa", location: "Minneapolis, MN", height: "175 m",
+    year: 2021, team: 10, duration: "8 wks", status: "completed",
+    work: [
+      { label: "Structural", pct: 38, color: "#185FA5" },
+      { label: "Foundation", pct: 24, color: "#1D9E75" },
+      { label: "Fatigue",    pct: 20, color: "#BA7517" },
+      { label: "Antenna",    pct: 18, color: "#993C1D" },
+    ],
+  },
+  {
+    id: 11, state: "Mississippi", lat: 32.2988, lng: -90.1848,
+    name: "Tower Lambda", location: "Jackson, MS", height: "162 m",
+    year: 2022, team: 7, duration: "5 wks", status: "ongoing",
+    work: [
+      { label: "FEA/CFD",   pct: 32, color: "#534AB7" },
+      { label: "Structural", pct: 28, color: "#185FA5" },
+      { label: "Foundation", pct: 22, color: "#1D9E75" },
+      { label: "Fatigue",    pct: 18, color: "#BA7517" },
+    ],
+  },
+  {
+    id: 12, state: "Missouri", lat: 38.627, lng: -90.1994,
+    name: "Tower Mu", location: "St. Louis, MO", height: "178 m",
+    year: 2023, team: 11, duration: "9 wks", status: "completed",
+    work: [
+      { label: "Structural", pct: 36, color: "#185FA5" },
+      { label: "Foundation", pct: 26, color: "#1D9E75" },
+      { label: "FEA/CFD",   pct: 20, color: "#534AB7" },
+      { label: "Fatigue",    pct: 10, color: "#BA7517" },
+      { label: "Antenna",    pct: 8,  color: "#993C1D" },
+    ],
+  },
+  {
+    id: 13, state: "New Hampshire", lat: 42.9956, lng: -71.4548,
+    name: "Tower Nu", location: "Manchester, NH", height: "192 m",
+    year: 2024, team: 8, duration: "6 wks", status: "ongoing",
+    work: [
+      { label: "Structural", pct: 42, color: "#185FA5" },
+      { label: "FEA/CFD",   pct: 28, color: "#534AB7" },
+      { label: "Foundation", pct: 18, color: "#1D9E75" },
+      { label: "Antenna",    pct: 12, color: "#993C1D" },
+    ],
+  },
+  {
+    id: 14, state: "North Carolina", lat: 35.2271, lng: -80.8431,
+    name: "Tower Xi", location: "Charlotte, NC", height: "168 m",
+    year: 2021, team: 9, duration: "7 wks", status: "completed",
+    work: [
+      { label: "Structural", pct: 34, color: "#185FA5" },
+      { label: "Foundation", pct: 24, color: "#1D9E75" },
+      { label: "Fatigue",    pct: 22, color: "#BA7517" },
+      { label: "FEA/CFD",   pct: 12, color: "#534AB7" },
+      { label: "Antenna",    pct: 8,  color: "#993C1D" },
+    ],
+  },
+  {
+    id: 15, state: "Ohio", lat: 39.9612, lng: -82.9988,
+    name: "Tower Omicron", location: "Columbus, OH", height: "185 m",
+    year: 2022, team: 10, duration: "8 wks", status: "completed",
+    work: [
+      { label: "Structural", pct: 36, color: "#185FA5" },
+      { label: "FEA/CFD",   pct: 26, color: "#534AB7" },
+      { label: "Foundation", pct: 20, color: "#1D9E75" },
+      { label: "Fatigue",    pct: 12, color: "#BA7517" },
+      { label: "Antenna",    pct: 6,  color: "#993C1D" },
+    ],
+  },
+  {
+    id: 16, state: "Oklahoma", lat: 35.4676, lng: -97.5164,
+    name: "Tower Pi", location: "Oklahoma City, OK", height: "172 m",
+    year: 2023, team: 8, duration: "6 wks", status: "ongoing",
+    work: [
+      { label: "FEA/CFD",   pct: 33, color: "#534AB7" },
+      { label: "Structural", pct: 29, color: "#185FA5" },
+      { label: "Foundation", pct: 22, color: "#1D9E75" },
+      { label: "Antenna",    pct: 16, color: "#993C1D" },
+    ],
+  },
+  {
+    id: 17, state: "South Carolina", lat: 34.0007, lng: -81.0348,
+    name: "Tower Rho", location: "Columbia, SC", height: "158 m",
+    year: 2021, team: 7, duration: "5 wks", status: "completed",
+    work: [
+      { label: "Structural", pct: 40, color: "#185FA5" },
+      { label: "Foundation", pct: 22, color: "#1D9E75" },
+      { label: "Fatigue",    pct: 20, color: "#BA7517" },
+      { label: "Antenna",    pct: 18, color: "#993C1D" },
+    ],
+  },
+  {
+    id: 18, state: "Tennessee", lat: 36.1627, lng: -86.7816,
+    name: "Tower Sigma", location: "Nashville, TN", height: "165 m",
+    year: 2022, team: 9, duration: "7 wks", status: "ongoing",
+    work: [
+      { label: "Structural", pct: 38, color: "#185FA5" },
+      { label: "FEA/CFD",   pct: 25, color: "#534AB7" },
+      { label: "Foundation", pct: 20, color: "#1D9E75" },
+      { label: "Fatigue",    pct: 17, color: "#BA7517" },
+    ],
+  },
+  {
+    id: 19, state: "Texas", lat: 32.7767, lng: -96.797,
+    name: "Tower Tau", location: "Dallas, TX", height: "210 m",
+    year: 2023, team: 14, duration: "12 wks", status: "ongoing",
+    work: [
+      { label: "Structural", pct: 32, color: "#185FA5" },
+      { label: "FEA/CFD",   pct: 28, color: "#534AB7" },
+      { label: "Foundation", pct: 20, color: "#1D9E75" },
+      { label: "Fatigue",    pct: 12, color: "#BA7517" },
+      { label: "Antenna",    pct: 8,  color: "#993C1D" },
+    ],
+  },
+  {
+    id: 20, state: "Virginia", lat: 37.5407, lng: -77.436,
+    name: "Tower Upsilon", location: "Richmond, VA", height: "177 m",
+    year: 2021, team: 8, duration: "6 wks", status: "completed",
+    work: [
+      { label: "Structural", pct: 36, color: "#185FA5" },
+      { label: "Foundation", pct: 24, color: "#1D9E75" },
+      { label: "FEA/CFD",   pct: 22, color: "#534AB7" },
+      { label: "Fatigue",    pct: 12, color: "#BA7517" },
+      { label: "Antenna",    pct: 6,  color: "#993C1D" },
+    ],
+  },
+  {
+    id: 21, state: "West Virginia", lat: 38.3498, lng: -81.6326,
+    name: "Tower Phi", location: "Charleston, WV", height: "168 m",
+    year: 2022, team: 7, duration: "5 wks", status: "completed",
+    work: [
+      { label: "Structural", pct: 38, color: "#185FA5" },
+      { label: "Foundation", pct: 26, color: "#1D9E75" },
+      { label: "Fatigue",    pct: 18, color: "#BA7517" },
+      { label: "Antenna",    pct: 12, color: "#993C1D" },
+      { label: "FEA/CFD",   pct: 6,  color: "#534AB7" },
+    ],
+  },
+  {
+    id: 22, state: "Wisconsin", lat: 43.0389, lng: -87.9065,
+    name: "Tower Chi", location: "Milwaukee, WI", height: "183 m",
+    year: 2024, team: 10, duration: "8 wks", status: "ongoing",
+    work: [
+      { label: "FEA/CFD",   pct: 34, color: "#534AB7" },
+      { label: "Structural", pct: 28, color: "#185FA5" },
+      { label: "Foundation", pct: 22, color: "#1D9E75" },
+      { label: "Fatigue",    pct: 16, color: "#BA7517" },
+    ],
+  },
+  {
+    id: 23, state: "Florida", lat: 25.7617, lng: -80.1918,
+    name: "Tower Psi", location: "Miami, FL", height: "195 m",
+    year: 2023, team: 13, duration: "11 wks", status: "ongoing",
+    work: [
+      { label: "FEA/CFD",   pct: 30, color: "#534AB7" },
+      { label: "Structural", pct: 28, color: "#185FA5" },
+      { label: "Foundation", pct: 22, color: "#1D9E75" },
+      { label: "Fatigue",    pct: 12, color: "#BA7517" },
+      { label: "Antenna",    pct: 8,  color: "#993C1D" },
+    ],
+  },
+];
 
-  const c = colors[status];
+// ── Custom Leaflet Icon factory ────────────────────────────────────────────
+function makeIcon(tower: Tower, isActive: boolean): L.DivIcon {
+  const bg = tower.status === "ongoing" ? "#BA7517" : "#185FA5";
+  const ring = tower.status === "ongoing" ? "rgba(186,117,23,0.25)" : "rgba(24,95,165,0.22)";
+  const border = isActive ? "3px solid #fff" : "2.5px solid #fff";
+  const size = isActive ? 34 : 30;
+  const shadow = isActive
+    ? `0 0 0 3px ${bg}55, 0 4px 14px rgba(0,0,0,0.35)`
+    : `0 2px 8px rgba(0,0,0,0.28)`;
 
-  return (
-    <div className="group absolute -translate-x-1/2 -translate-y-full flex flex-col items-center cursor-pointer z-10">
-      {/* Tooltip */}
-      <div className="absolute -top-9 left-1/2 -translate-x-1/2 bg-gray-900/95 backdrop-blur-sm border border-white/15 rounded-lg px-2.5 py-1 text-[10px] font-semibold text-white whitespace-nowrap opacity-0 group-hover:opacity-100 transition-all duration-200 pointer-events-none shadow-xl">
-        {label}
-        <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-gray-900/95 border-r border-b border-white/15 rotate-45" />
-      </div>
-
-      {/* Outer pulse ring */}
-      <div
-        className={`absolute w-5 h-5 rounded-full ${c.dot} opacity-20`}
-        style={{ animation: "outerPulse 2s ease-out infinite" }}
-      />
-
-      {/* Dot */}
-      <div
-        className={`w-3 h-3 rounded-full ${c.dot} border-2 border-white/80 relative z-10`}
-        style={{ boxShadow: c.glow }}
-      />
-      {/* Stem */}
-      <div className={`w-px h-5 ${c.line} opacity-60`} />
-      {/* Base dot */}
-      <div className={`w-1.5 h-1.5 rounded-full ${c.dot} opacity-50`} />
+  const html = `
+    <div style="
+      position:relative;
+      width:${size}px;
+      height:${size}px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    ">
+      ${isActive ? `<div style="
+        position:absolute;
+        inset:-8px;
+        border-radius:50%;
+        background:${ring};
+        animation:towerPulse 2.2s ease-out infinite;
+      "></div>` : ""}
+      <div style="
+        position:relative;
+        width:${size}px;
+        height:${size}px;
+        border-radius:50%;
+        background:${bg};
+        border:${border};
+        box-shadow:${shadow};
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+        font-size:${isActive ? 11 : 10}px;
+        font-weight:700;
+        color:#fff;
+        transition:all 0.2s;
+        cursor:pointer;
+      ">${tower.id}</div>
     </div>
-  );
-};
+  `;
 
-// ─── Animated Tower SVG ────────────────────────────────────────────────────
-const AnimatedTower: React.FC = () => (
-  <svg
-    width="100"
-    height="170"
-    viewBox="0 0 90 160"
-    fill="none"
-    xmlns="http://www.w3.org/2000/svg"
-    className="relative z-10 drop-shadow-[0_0_18px_rgba(59,130,246,0.5)]"
-  >
-    {/* Main legs */}
-    <line x1="45" y1="10" x2="15" y2="150" stroke="url(#legGrad)" strokeWidth="2.5" strokeLinecap="round" />
-    <line x1="45" y1="10" x2="75" y2="150" stroke="url(#legGrad)" strokeWidth="2.5" strokeLinecap="round" />
-
-    {/* Horizontal cross-members */}
-    <line x1="22" y1="50" x2="68" y2="50" stroke="#3b82f6" strokeWidth="1.5" opacity="0.7" />
-    <line x1="18" y1="80" x2="72" y2="80" stroke="#3b82f6" strokeWidth="1.5" opacity="0.7" />
-    <line x1="14" y1="110" x2="76" y2="110" stroke="#3b82f6" strokeWidth="1.5" opacity="0.7" />
-    <line x1="10" y1="140" x2="80" y2="140" stroke="#3b82f6" strokeWidth="2" opacity="0.9" />
-
-    {/* Diagonal braces */}
-    <line x1="22" y1="50" x2="33" y2="80" stroke="#60a5fa" strokeWidth="1" opacity="0.4" />
-    <line x1="68" y1="50" x2="57" y2="80" stroke="#60a5fa" strokeWidth="1" opacity="0.4" />
-    <line x1="18" y1="80" x2="28" y2="110" stroke="#60a5fa" strokeWidth="1" opacity="0.4" />
-    <line x1="72" y1="80" x2="62" y2="110" stroke="#60a5fa" strokeWidth="1" opacity="0.4" />
-    <line x1="14" y1="110" x2="24" y2="140" stroke="#60a5fa" strokeWidth="1" opacity="0.4" />
-    <line x1="76" y1="110" x2="66" y2="140" stroke="#60a5fa" strokeWidth="1" opacity="0.4" />
-
-    {/* Antenna */}
-    <line x1="45" y1="0" x2="45" y2="12" stroke="#f59e0b" strokeWidth="2.5" strokeLinecap="round" />
-    {/* Antenna arms */}
-    <line x1="38" y1="6" x2="45" y2="10" stroke="#f59e0b" strokeWidth="1.5" opacity="0.7" />
-    <line x1="52" y1="6" x2="45" y2="10" stroke="#f59e0b" strokeWidth="1.5" opacity="0.7" />
-
-    {/* Blinking beacon */}
-    <circle cx="45" cy="0" r="3.5" fill="#f59e0b">
-      <animate attributeName="opacity" values="1;0.1;1" dur="1.1s" repeatCount="indefinite" />
-      <animate attributeName="r" values="3;4.5;3" dur="1.1s" repeatCount="indefinite" />
-    </circle>
-
-    {/* Signal arcs */}
-    <path d="M 55 -8 Q 70 0 55 8" stroke="#f59e0b" strokeWidth="1.5" fill="none" opacity="0.5">
-      <animate attributeName="opacity" values="0.6;0;0.6" dur="1.5s" repeatCount="indefinite" />
-    </path>
-    <path d="M 62 -14 Q 82 0 62 14" stroke="#f59e0b" strokeWidth="1" fill="none" opacity="0.3">
-      <animate attributeName="opacity" values="0.4;0;0.4" dur="1.5s" begin="0.3s" repeatCount="indefinite" />
-    </path>
-
-    <defs>
-      <linearGradient id="legGrad" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%" stopColor="#93c5fd" />
-        <stop offset="100%" stopColor="#1d4ed8" />
-      </linearGradient>
-    </defs>
-  </svg>
-);
-
-// ─── Metric Chip ───────────────────────────────────────────────────────────
-const MetricChip: React.FC<MetricChipProps> = ({
-  value,
-  unit,
-  label,
-  color = "text-blue-400",
-  bgColor = "rgba(59,130,246,0.06)",
-  trend,
-}) => (
-  <div
-    className="flex-1 rounded-xl p-3 text-center border border-white/[0.07] relative overflow-hidden"
-    style={{ background: bgColor }}
-  >
-    <div className="absolute inset-0 opacity-10"
-      style={{ background: "radial-gradient(circle at 50% 0%, white, transparent 70%)" }} />
-    <span className={`block font-mono text-2xl font-bold ${color} relative`}>
-      {value}
-      <span className="text-xs font-normal ml-0.5 opacity-80">{unit}</span>
-    </span>
-    <span className="block text-[10px] text-slate-500 uppercase tracking-widest mt-1">
-      {label}
-    </span>
-    {trend && (
-      <span className={`text-[9px] mt-0.5 block font-semibold ${
-        trend === "up" ? "text-red-400" : trend === "down" ? "text-green-400" : "text-slate-500"
-      }`}>
-        {trend === "up" ? "▲ Rising" : trend === "down" ? "▼ Falling" : "● Stable"}
-      </span>
-    )}
-  </div>
-);
-
-// ─── Sparkline ─────────────────────────────────────────────────────────────
-const Sparkline: React.FC<{ data: number[]; color: string }> = ({ data, color }) => {
-  const max = Math.max(...data);
-  const min = Math.min(...data);
-  const range = max - min || 1;
-  const w = 200, h = 40;
-  const pts = data.map((v, i) => {
-    const x = (i / (data.length - 1)) * w;
-    const y = h - ((v - min) / range) * h;
-    return `${x},${y}`;
-  }).join(" ");
-
-  return (
-    <svg width={w} height={h} viewBox={`0 0 ${w} ${h}`} className="w-full">
-      <polyline points={pts} fill="none" stroke={color} strokeWidth="1.5" strokeLinejoin="round" />
-      <polyline
-        points={`0,${h} ${pts} ${w},${h}`}
-        fill={color}
-        fillOpacity="0.08"
-        stroke="none"
-      />
-    </svg>
-  );
-};
-
-// ─── Pin data ──────────────────────────────────────────────────────────────
-interface PinData {
-  left: string;
-  top: string;
-  label: string;
-  status: PinStatus;
+  return L.divIcon({
+    html,
+    className: "",
+    iconSize: [size + 16, size + 16],
+    iconAnchor: [(size + 16) / 2, (size + 16) / 2],
+    popupAnchor: [0, -(size / 2 + 8)],
+  });
 }
 
-const PINS: PinData[] = [
-  { left: "22%", top: "26%", label: "Tower A-12", status: "ok" },
-  { left: "60%", top: "20%", label: "Tower B-07 ⚠", status: "critical" },
-  { left: "80%", top: "52%", label: "Tower C-21", status: "ok" },
-  { left: "45%", top: "58%", label: "Tower D-03", status: "warn" },
-  { left: "15%", top: "72%", label: "Tower E-15", status: "ok" },
-  { left: "68%", top: "78%", label: "Tower F-09", status: "ok" },
-];
-
-const LEGEND = [
-  { color: "bg-blue-500", glow: "shadow-[0_0_6px_rgba(59,130,246,0.8)]", label: "Operational" },
-  { color: "bg-amber-400", glow: "shadow-[0_0_6px_rgba(245,158,11,0.8)]", label: "Under Review" },
-  { color: "bg-red-500", glow: "shadow-[0_0_6px_rgba(239,68,68,0.8)]", label: "Critical Alert" },
-];
-
-const RING_SIZES = [70, 110, 155, 200];
-
-// ─── Main ──────────────────────────────────────────────────────────────────
-const MapSection: React.FC = () => {
-  const [loadFactor, setLoadFactor] = useState(87);
-  const [windSpeed, setWindSpeed] = useState(34);
-  const [uptime, setUptime] = useState(99.4);
-  const [tick, setTick] = useState(0);
-  const [loadHistory, setLoadHistory] = useState<number[]>([82, 85, 87, 84, 89, 86, 88, 87]);
-  const [windHistory, setWindHistory] = useState<number[]>([30, 33, 35, 32, 38, 34, 36, 34]);
-
+// ── Set initial view (works with react-leaflet v4 which dropped center/zoom props) ──
+function SetInitialView() {
+  const map = useMap();
   useEffect(() => {
-    const id = setInterval(() => {
-      const newLoad = Math.round(84 + Math.random() * 8);
-      const newWind = Math.round(30 + Math.random() * 12);
-      setLoadFactor(newLoad);
-      setWindSpeed(newWind);
-      setUptime(parseFloat((99 + Math.random() * 0.9).toFixed(1)));
-      setLoadHistory(prev => [...prev.slice(-7), newLoad]);
-      setWindHistory(prev => [...prev.slice(-7), newWind]);
-      setTick(t => t + 1);
-    }, 2000);
-    return () => clearInterval(id);
+    map.setView([38.5, -95] as [number, number], 4);
   }, []);
+  return null;
+}
+
+// ── Map fly-to helper ──────────────────────────────────────────────────────
+function FlyTo({ tower }: { tower: Tower | null }) {
+  const map = useMap();
+  useEffect(() => {
+    if (tower) {
+      map.flyTo([tower.lat, tower.lng] as [number, number], 7, { duration: 0.9 });
+    }
+  }, [tower, map]);
+  return null;
+}
+
+// ── Detail Panel ───────────────────────────────────────────────────────────
+function DetailPanel({ tower }: { tower: Tower | null }) {
+  if (!tower) {
+    return (
+      <div style={styles.panel}>
+        <div style={styles.panelHeader}>
+          <p style={{ ...styles.panelTitle, color: "#8a9ab5", fontWeight: 400 }}>
+            No location selected
+          </p>
+        </div>
+        <div style={styles.emptyState}>
+          <svg width={40} height={40} viewBox="0 0 24 24" fill="none"
+            stroke="#8a9ab5" strokeWidth={1.2} opacity={0.4}>
+            <path d="M12 2L8 12H2l4.5 3.5L5 22l7-4 7 4-1.5-6.5L22 12h-6L12 2z"/>
+          </svg>
+          <p style={styles.emptyText}>
+            Click any pin on the map to explore tower project details and work breakdown.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  const ongoing = tower.status === "ongoing";
 
   return (
-    <section className="relative py-24 md:py-32 overflow-hidden bg-[#07090f]">
-
-      {/* Ambient background blobs */}
-      <div className="absolute top-1/4 left-1/4 w-96 h-96 rounded-full opacity-[0.04] blur-3xl"
-        style={{ background: "radial-gradient(circle, #3b82f6, transparent)" }} />
-      <div className="absolute bottom-1/4 right-1/4 w-80 h-80 rounded-full opacity-[0.03] blur-3xl"
-        style={{ background: "radial-gradient(circle, #f59e0b, transparent)" }} />
-
-      {/* Grid texture */}
-      <div className="absolute inset-0 opacity-[0.15]" style={{
-        backgroundImage:
-          "repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(6, 4, 39, 0.04) 39px,rgba(255,255,255,0.04) 40px),repeating-linear-gradient(90deg,transparent,transparent 59px,rgba(255,255,255,0.04) 59px,rgba(255,255,255,0.04) 60px)",
-      }} />
-
-      <div className="relative max-w-7xl mx-auto px-3 md:px-4">
-
-        {/* ── Header ── */}
-        <motion.div
-          className="mb-14"
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-        >
-          <div className="flex items-center gap-2 mb-4">
-            <span className="inline-flex items-center gap-2 rounded-full bg-blue-500/10 border border-blue-500/20 px-3 py-1 text-[11px] font-semibold tracking-widest text-blue-400 uppercase">
-              <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse" />
-              Infrastructure Monitoring
-            </span>
-            <span className="text-[11px] text-slate-600 font-mono">
-              Last updated: {new Date().toLocaleTimeString()}
-            </span>
+    <div style={styles.panel}>
+      {/* Header */}
+      <div style={styles.panelHeader}>
+        <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 8 }}>
+          <div>
+            <p style={styles.panelTitle}>{tower.state}</p>
+            <p style={styles.panelSub}>{tower.name} · {tower.location}</p>
           </div>
-          <h2 className="font-display text-4xl md:text-5xl font-bold text-slate-100 leading-tight max-w-2xl">
-            Tower Network Coverage &amp;{" "}
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-orange-500">
-              Live Structural Health
-            </span>
-          </h2>
-          <p className="mt-4 text-slate-400 text-base max-w-xl leading-relaxed">
-            Real-time geospatial mapping of active cell towers combined with AI-driven
-            structural diagnostics — every node, every stress point, always visible.
-          </p>
-
-          {/* Summary stats row */}
-          <div className="flex flex-wrap gap-6 mt-8">
-            {[
-              { val: "47", label: "Active Towers", color: "text-blue-400" },
-              { val: "2", label: "Critical Alerts", color: "text-red-400" },
-              { val: `${uptime}%`, label: "Network Uptime", color: "text-green-400" },
-              { val: "142K", label: "FEA Nodes", color: "text-amber-400" },
-            ].map(({ val, label, color }) => (
-              <div key={label} className="flex flex-col">
-                <span className={`font-mono text-2xl font-bold ${color}`}>{val}</span>
-                <span className="text-[11px] text-slate-500 uppercase tracking-widest">{label}</span>
-              </div>
-            ))}
-          </div>
-        </motion.div>
-
-        {/* ── Two-column grid ── */}
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr_1.6fr] gap-5">
-
-          {/* ── LEFT: MAP ── */}
-          <motion.div
-            initial={{ opacity: 0, x: -30 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true, margin: "-80px" }}
-            transition={{ duration: 0.7 }}
-            className=" order-2 lg:order-2 rounded-2xl max-w-7xl border border-white/[0.08] bg-[#0d1117] overflow-hidden flex flex-col"
-            style={{ boxShadow: "0 0 40px rgba(149, 181, 231, 0.05), inset 0 1px 0 rgba(255,255,255,0.05)" }}
-          >
-            {/* Card header */}
-            <div className="flex order-1 lg:order-1 items-center gap-2.5 px-5 py-4 border-b border-white/[0.06] bg-white/[0.02]">
-              <span className="w-2 h-2 rounded-full bg-amber-400 shadow-[0_0_8px_#f59e0b] animate-pulse" />
-              <span className="font-display text-xs font-bold tracking-widest text-slate-200 uppercase">
-                Deployment Map
-              </span>
-              <div className="ml-auto flex items-center gap-2">
-                <span className="text-[11px] text-slate-500 font-mono">North Region</span>
-                <span className="bg-blue-500/15 text-blue-400 text-[10px] font-bold px-2 py-0.5 rounded-full border border-blue-500/20">
-                  47 Assets
-                </span>
-              </div>
-            </div>
-
-            {/* Map area */}
-            <div className="relative flex-1 overflow-hidden min-h-[360px]">
-              <img
-                src={staticMap}
-                alt="Tower deployment map"
-                className="absolute inset-0 w-full h-full object-cover"
-              />
-              {/* Overlays */}
-              <div className="absolute inset-0 bg-[#07090f]/50" />
-              <div className="absolute inset-0"
-                style={{ background: "radial-gradient(ellipse at 50% 50%, transparent 40%, rgba(7,9,15,0.6) 100%)" }} />
-
-              {/* Corner brackets */}
-              {[
-                "top-3 left-3 border-t border-l",
-                "top-3 right-3 border-t border-r",
-                "bottom-3 left-3 border-b border-l",
-                "bottom-3 right-3 border-b border-r",
-              ].map((cls) => (
-                <div key={cls} className={`absolute w-5 h-5 ${cls} border-blue-400/40`} />
-              ))}
-
-              {/* Scan line */}
-              <div
-                className="absolute left-0 right-0 h-px z-20"
-                style={{
-                  background: "linear-gradient(90deg, transparent, rgba(59,130,246,0.8) 30%, rgba(147,197,253,1) 50%, rgba(59,130,246,0.8) 70%, transparent)",
-                  animation: "scanMove 3.5s linear infinite",
-                  boxShadow: "0 0 8px rgba(59,130,246,0.6)",
-                }}
-              />
-
-              {/* Pins */}
-              <div className="absolute inset-0 z-10">
-                {PINS.map((pin) => (
-                  <div key={pin.label} className="absolute" style={{ left: pin.left, top: pin.top }}>
-                    <TowerPin label={pin.label} status={pin.status} />
-                  </div>
-                ))}
-              </div>
-
-              {/* Bottom overlay */}
-              <div className="absolute bottom-0 left-0 right-0 px-5 py-4 bg-gradient-to-t from-[#07090f] via-[#07090f]/60 to-transparent z-20 flex items-end justify-between">
-                <div>
-                  <div className="font-mono text-4xl font-bold text-blue-400 leading-none"
-                    style={{ textShadow: "0 0 20px rgba(59,130,246,0.6)" }}>
-                    47
-                  </div>
-                  <div className="text-[10px] uppercase tracking-widest text-slate-500 mt-1">
-                    Active Towers
-                  </div>
-                </div>
-                <div className="flex flex-col gap-2 items-end">
-                  {LEGEND.map(({ color, glow, label }) => (
-                    <div key={label} className="flex items-center gap-2 text-[10px] text-slate-400">
-                      <div className={`w-2 h-2 rounded-full ${color} ${glow}`} />
-                      {label}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </motion.div>
-
-          {/* ── RIGHT: HEALTH MONITOR ── */}
-          <motion.div
-            initial={{ opacity: 0, x: 30 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true, margin: "-80px" }}
-            transition={{ duration: 0.7 }}
-            className="rounded-2xl border border-white/[0.08] bg-[#0d1117] overflow-hidden flex flex-col"
-            style={{ boxShadow: "0 0 40px rgba(59,130,246,0.05), inset 0 1px 0 rgba(255,255,255,0.05)" }}
-          >
-            {/* Card header */}
-            <div className="flex items-center gap-2.5 px-5 py-4 border-b border-white/[0.06] bg-white/[0.02]">
-              <span className="font-display text-xs font-bold tracking-widest text-slate-200 uppercase flex-1">
-                Structural Health Monitor
-              </span>
-              <span className="flex items-center gap-1.5 bg-red-500/10 border border-red-500/25 rounded-full px-2.5 py-0.5 text-[10px] font-bold text-red-400 uppercase tracking-widest">
-                <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
-                Live
-              </span>
-            </div>
-
-            {/* Body */}
-            <div className="flex-1 flex flex-col items-center justify-center gap-5 p-6"
-              style={{ background: "radial-gradient(ellipse at center top, rgba(59,130,246,0.06) 0%, transparent 65%)" }}
-            >
-              {/* Tower + rings */}
-              <div className="relative flex items-center justify-center" style={{ width: 240, height: 240 }}>
-                {RING_SIZES.map((size, i) => (
-                  <div
-                    key={size}
-                    className="absolute rounded-full"
-                    style={{
-                      width: size,
-                      height: size,
-                      border: "1.5px solid rgba(59,130,246,0.5)",
-                      animation: `ringOut 2.8s ease-out ${i * 0.7}s infinite`,
-                    }}
-                  />
-                ))}
-                {/* Center glow */}
-                <div className="absolute w-16 h-16 rounded-full opacity-20 blur-xl"
-                  style={{ background: "radial-gradient(circle, #3b82f6, transparent)" }} />
-                <AnimatedTower />
-              </div>
-
-              {/* Metric chips */}
-              <div className="flex gap-2.5 w-full">
-                <MetricChip
-                  value={loadFactor}
-                  unit="%"
-                  label="Load Factor"
-                  color="text-blue-400"
-                  bgColor="rgba(59,130,246,0.06)"
-                  trend={loadFactor > 88 ? "up" : "stable"}
-                />
-                <MetricChip
-                  value={windSpeed}
-                  unit="m/s"
-                  label="Wind Speed"
-                  color="text-amber-400"
-                  bgColor="rgba(245,158,11,0.06)"
-                  trend={windSpeed > 38 ? "up" : "down"}
-                />
-                <MetricChip
-                  value={2}
-                  unit=""
-                  label="Alerts"
-                  color="text-red-400"
-                  bgColor="rgba(239,68,68,0.06)"
-                  trend="stable"
-                />
-              </div>
-
-              {/* Sparklines */}
-              <div className="w-full grid grid-cols-2 gap-2.5">
-                <div className="bg-white/[0.03] border border-white/[0.06] rounded-xl p-3">
-                  <div className="text-[9px] text-slate-500 uppercase tracking-widest mb-2">Load History</div>
-                  <Sparkline data={loadHistory} color="#60a5fa" />
-                </div>
-                <div className="bg-white/[0.03] border border-white/[0.06] rounded-xl p-3">
-                  <div className="text-[9px] text-slate-500 uppercase tracking-widest mb-2">Wind History</div>
-                  <Sparkline data={windHistory} color="#fbbf24" />
-                </div>
-              </div>
-
-              {/* FEA stress bar */}
-              <div className="w-full bg-white/[0.03] border border-white/[0.06] rounded-xl px-4 py-3">
-                <div className="flex justify-between items-center mb-2">
-                  <div className="text-[10px] text-slate-500 uppercase tracking-widest">FEA Stress Analysis</div>
-                  <div className="text-[10px] font-mono text-amber-400 font-semibold">87%</div>
-                </div>
-                <div className="h-1.5 rounded-full bg-white/[0.06] overflow-hidden mb-2 relative">
-                  <motion.div
-                    initial={{ width: "0%" }}
-                    whileInView={{ width: "87%" }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 2, ease: "easeOut" }}
-                    className="h-full rounded-full relative overflow-hidden"
-                    style={{ background: "linear-gradient(90deg, #3b82f6, #60a5fa, #f59e0b)" }}
-                  >
-                    {/* Shimmer */}
-                    <div className="absolute inset-0 opacity-40"
-                      style={{
-                        background: "linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.5) 50%, transparent 100%)",
-                        animation: "shimmer 2s linear infinite",
-                        backgroundSize: "200% 100%",
-                      }} />
-                  </motion.div>
-                </div>
-                <div className="flex justify-between text-[10px] text-slate-600">
-                  <span>0 nodes</span>
-                  <span className="text-amber-400/80 font-semibold">142,000 nodes computed</span>
-                  <span>163,000</span>
-                </div>
-              </div>
-
-              {/* Alert log */}
-              <div className="w-full bg-white/[0.02] border border-white/[0.05] rounded-xl px-4 py-3 space-y-2">
-                <div className="text-[10px] text-slate-500 uppercase tracking-widest mb-2">Recent Alerts</div>
-                {[
-                  { time: "02:14", msg: "Tower B-07 — wind load exceeded threshold", color: "text-red-400", dot: "bg-red-500" },
-                  { time: "01:48", msg: "Tower D-03 — scheduled inspection due", color: "text-amber-400", dot: "bg-amber-400" },
-                ].map(({ time, msg, color, dot }) => (
-                  <div key={time} className="flex items-start gap-2.5">
-                    <span className={`w-1.5 h-1.5 rounded-full ${dot} mt-1 shrink-0`} />
-                    <span className="font-mono text-[10px] text-slate-600 shrink-0">{time}</span>
-                    <span className={`text-[11px] ${color}`}>{msg}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </motion.div>
+          <span style={{
+            ...styles.badge,
+            background: ongoing ? "#FAEEDA" : "#EAF3DE",
+            color: ongoing ? "#854F0B" : "#3B6D11",
+          }}>
+            {ongoing ? "Ongoing" : "Completed"}
+          </span>
         </div>
       </div>
 
-      {/* Keyframes */}
-      <style>{`
-        @keyframes scanMove {
-          0%   { top: 0%;   opacity: 0; }
-          5%   { opacity: 1; }
-          95%  { opacity: 1; }
-          100% { top: 100%; opacity: 0; }
-        }
-        @keyframes ringOut {
-          0%   { opacity: 0.7; transform: scale(0.3); }
-          100% { opacity: 0;   transform: scale(1);   }
-        }
-        @keyframes outerPulse {
-          0%   { transform: scale(1);   opacity: 0.4; }
-          100% { transform: scale(2.5); opacity: 0;   }
-        }
-        @keyframes shimmer {
-          0%   { background-position: -200% 0; }
-          100% { background-position: 200% 0; }
-        }
-      `}</style>
-    </section>
-  );
-};
+      {/* Donut chart */}
+      <div style={{ padding: "14px 16px 0", display: "flex", justifyContent: "center" }}>
+        <PieChart width={160} height={160}>
+          <Pie
+            data={tower.work}
+            dataKey="pct"
+            nameKey="label"
+            cx={80} cy={80}
+            innerRadius={46}
+            outerRadius={72}
+            stroke="#fff"
+            strokeWidth={3}
+            animationBegin={0}
+            animationDuration={450}
+          >
+            {tower.work.map((w, i) => <Cell key={i} fill={w.color} />)}
+          </Pie>
+          <Tooltip
+            formatter={(v: number, name: string) => [`${v}%`, name]}
+            contentStyle={{
+              fontSize: 12,
+              borderRadius: 8,
+              border: "1px solid rgba(0,0,0,0.1)",
+              boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+            }}
+          />
+        </PieChart>
+      </div>
 
-export default MapSection;
+      {/* Legend */}
+      <div style={{ padding: "4px 16px 12px", display: "flex", flexDirection: "column", gap: 5 }}>
+        {tower.work.map((w, i) => (
+          <div key={i} style={styles.legendRow}>
+            <span style={{ ...styles.legendSwatch, background: w.color }} />
+            <span style={styles.legendLabel}>{w.label}</span>
+            <span style={styles.legendPct}>{w.pct}%</span>
+          </div>
+        ))}
+      </div>
+
+      {/* Metrics */}
+      <div style={styles.metricsGrid}>
+        {[
+          { label: "Height",    value: tower.height },
+          { label: "Year",      value: String(tower.year) },
+          { label: "Team size", value: `${tower.team} eng.` },
+          { label: "Duration",  value: tower.duration },
+        ].map((m) => (
+          <div key={m.label} style={styles.metricCard}>
+            <p style={styles.metricLabel}>{m.label}</p>
+            <p style={styles.metricValue}>{m.value}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ── Main Component ─────────────────────────────────────────────────────────
+export default function TowerMap() {
+  const [selected, setSelected] = useState<Tower | null>(null);
+
+  // Inject pulse keyframes once
+  useEffect(() => {
+    const id = "tower-pulse-style";
+    if (!document.getElementById(id)) {
+      const style = document.createElement("style");
+      style.id = id;
+      style.textContent = `
+        @keyframes towerPulse {
+          0%   { opacity: 0.7; transform: scale(1); }
+          70%  { opacity: 0;   transform: scale(2.2); }
+          100% { opacity: 0;   transform: scale(2.2); }
+        }
+      `;
+      document.head.appendChild(style);
+    }
+  }, []);
+
+  return (
+    <div style={styles.page}>
+      {/* Page header */}
+      <div style={styles.pageHeader}>
+        <span style={styles.headerBadge}>Project Map</span>
+        <h1 style={styles.h1}>ATSS Tower Infrastructure</h1>
+        <p style={styles.subtitle}>
+          Click any marker to explore project details. Map powered by OpenStreetMap.
+        </p>
+      </div>
+
+      {/* App shell */}
+      <div style={styles.shell}>
+        {/* Map */}
+        <div style={styles.mapWrap}>
+          <MapContainer
+            style={{ width: "100%", height: "100%" }}
+            zoomControl={true}
+            scrollWheelZoom={true}
+          >
+            <SetInitialView />
+            {/* CARTO Voyager tiles — built on OpenStreetMap, no API key needed */}
+            <TileLayer
+              attribution="\u00a9 OpenStreetMap contributors \u00a9 CARTO"
+              url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
+              subdomains={["a", "b", "c", "d"]}
+              maxZoom={19}
+            />
+
+            <FlyTo tower={selected} />
+
+            {towers.map((tower) => (
+              <Marker
+                key={tower.id}
+                position={[tower.lat, tower.lng] as [number, number]}
+                icon={makeIcon(tower, selected?.id === tower.id)}
+                eventHandlers={{
+                  click: () => setSelected(tower),
+                }}
+              >
+                <Popup>
+                  <div style={{
+                    fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
+                    fontSize: 13,
+                    lineHeight: 1.5,
+                    minWidth: 160,
+                  }}>
+                    <strong style={{ fontSize: 14 }}>{tower.name}</strong>
+                    <br />
+                    <span style={{ color: "#5a6a8a" }}>{tower.location}</span>
+                    <br />
+                    <span style={{
+                      display: "inline-block",
+                      marginTop: 5,
+                      fontSize: 11,
+                      fontWeight: 600,
+                      padding: "2px 8px",
+                      borderRadius: 999,
+                      background: tower.status === "ongoing" ? "#FAEEDA" : "#EAF3DE",
+                      color: tower.status === "ongoing" ? "#854F0B" : "#3B6D11",
+                    }}>
+                      {tower.status === "ongoing" ? "Ongoing" : "Completed"}
+                    </span>
+                    <br />
+                    <button
+                      onClick={() => setSelected(tower)}
+                      style={{
+                        marginTop: 8,
+                        padding: "4px 10px",
+                        fontSize: 12,
+                        borderRadius: 6,
+                        border: "1px solid #185FA5",
+                        background: "#185FA5",
+                        color: "#fff",
+                        cursor: "pointer",
+                      }}
+                    >
+                      View details →
+                    </button>
+                  </div>
+                </Popup>
+              </Marker>
+            ))}
+          </MapContainer>
+
+          {/* Map legend overlay */}
+          <div style={styles.mapLegend}>
+            {[
+              { label: "Completed", color: "#185FA5" },
+              { label: "Ongoing",   color: "#BA7517" },
+            ].map(({ label, color }) => (
+              <div key={label} style={styles.legendRowMap}>
+                <div style={{ ...styles.legendDot, background: color }} />
+                <span style={{ fontSize: 11, color: "#0a1640" }}>{label}</span>
+              </div>
+            ))}
+          </div>
+
+          {/* Tower count badge */}
+          <div style={styles.countBadge}>
+            <span style={{ fontWeight: 700, fontSize: 14, color: "#0a1640" }}>
+              {towers.length}
+            </span>
+            <span style={{ fontSize: 11, color: "#5a6a8a", marginLeft: 4 }}>towers</span>
+          </div>
+        </div>
+
+        {/* Detail panel */}
+        <DetailPanel tower={selected} />
+      </div>
+    </div>
+  );
+}
+
+// ── Styles ─────────────────────────────────────────────────────────────────
+const styles: Record<string, React.CSSProperties> = {
+  page: {
+    fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
+    background: "#f0f4f8",
+    minHeight: "100vh",
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    padding: "32px 16px",
+  },
+  pageHeader: {
+    width: "100%",
+    maxWidth: 1140,
+    marginBottom: 20,
+  },
+  headerBadge: {
+    display: "inline-block",
+    background: "linear-gradient(135deg, #b8962e, #f0d060)",
+    color: "#0a1640",
+    fontSize: 11,
+    fontWeight: 700,
+    letterSpacing: "0.1em",
+    textTransform: "uppercase",
+    padding: "3px 12px",
+    borderRadius: 999,
+    marginBottom: 8,
+  },
+  h1: {
+    fontSize: 26,
+    fontWeight: 700,
+    color: "#0a1640",
+    letterSpacing: "-0.02em",
+    margin: 0,
+  },
+  subtitle: {
+    fontSize: 14,
+    color: "#5a6a8a",
+    marginTop: 4,
+  },
+  shell: {
+    display: "flex",
+    width: "100%",
+    maxWidth: 1140,
+    height: 560,
+    borderRadius: 16,
+    overflow: "hidden",
+    border: "1px solid rgba(10,22,64,0.12)",
+    boxShadow: "0 8px 40px rgba(10,22,64,0.12)",
+    background: "#fff",
+  },
+  mapWrap: {
+    flex: "1 1 0",
+    position: "relative",
+    minWidth: 0,
+  },
+  mapLegend: {
+    position: "absolute",
+    bottom: 24,
+    left: 12,
+    zIndex: 1000,
+    background: "rgba(255,255,255,0.95)",
+    borderRadius: 8,
+    border: "1px solid rgba(10,22,64,0.1)",
+    padding: "8px 12px",
+    display: "flex",
+    flexDirection: "column",
+    gap: 5,
+    backdropFilter: "blur(4px)",
+    pointerEvents: "none",
+  },
+  legendRowMap: {
+    display: "flex",
+    alignItems: "center",
+    gap: 6,
+  },
+  legendDot: {
+    width: 10,
+    height: 10,
+    borderRadius: "50%",
+    border: "2px solid #fff",
+    boxShadow: "0 1px 3px rgba(0,0,0,0.2)",
+  },
+  countBadge: {
+    position: "absolute",
+    top: 12,
+    left: 12,
+    zIndex: 1000,
+    background: "rgba(255,255,255,0.95)",
+    borderRadius: 8,
+    border: "1px solid rgba(10,22,64,0.1)",
+    padding: "6px 12px",
+    backdropFilter: "blur(4px)",
+    display: "flex",
+    alignItems: "baseline",
+    pointerEvents: "none",
+  },
+  panel: {
+    flex: "0 0 270px",
+    display: "flex",
+    flexDirection: "column",
+    borderLeft: "1px solid rgba(10,22,64,0.1)",
+    background: "#fff",
+    overflow: "hidden",
+  },
+  panelHeader: {
+    padding: "16px 16px 12px",
+    borderBottom: "1px solid rgba(10,22,64,0.08)",
+    flexShrink: 0,
+  },
+  panelTitle: {
+    fontSize: 16,
+    fontWeight: 700,
+    color: "#0a1640",
+    lineHeight: 1.3,
+    margin: 0,
+  },
+  panelSub: {
+    fontSize: 11,
+    color: "#5a6a8a",
+    marginTop: 3,
+    marginBottom: 0,
+  },
+  badge: {
+    display: "inline-block",
+    fontSize: 10,
+    fontWeight: 600,
+    padding: "2px 9px",
+    borderRadius: 999,
+    flexShrink: 0,
+    whiteSpace: "nowrap",
+    marginTop: 2,
+  },
+  emptyState: {
+    flex: 1,
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 12,
+    padding: 24,
+    textAlign: "center",
+  },
+  emptyText: {
+    fontSize: 13,
+    lineHeight: 1.6,
+    color: "#8a9ab5",
+    maxWidth: 200,
+    margin: 0,
+  },
+  legendRow: {
+    display: "flex",
+    alignItems: "center",
+    gap: 7,
+    fontSize: 12,
+    color: "#5a6a8a",
+  },
+  legendSwatch: {
+    width: 8,
+    height: 8,
+    borderRadius: 2,
+    flexShrink: 0,
+  },
+  legendLabel: {
+    flex: 1,
+  },
+  legendPct: {
+    fontWeight: 600,
+    fontSize: 12,
+    color: "#0a1640",
+    minWidth: 28,
+    textAlign: "right",
+  },
+  metricsGrid: {
+    display: "grid",
+    gridTemplateColumns: "1fr 1fr",
+    gap: 7,
+    padding: "4px 16px 16px",
+  },
+  metricCard: {
+    background: "#f4f6fa",
+    borderRadius: 8,
+    padding: "8px 10px",
+    border: "1px solid rgba(10,22,64,0.06)",
+  },
+  metricLabel: {
+    fontSize: 10,
+    color: "#5a6a8a",
+    margin: 0,
+  },
+  metricValue: {
+    fontSize: 14,
+    fontWeight: 700,
+    color: "#0a1640",
+    marginTop: 2,
+    marginBottom: 0,
+  },
+};
