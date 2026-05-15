@@ -17,7 +17,7 @@ const services = [
   {
     icon: Activity,
     title: "Tower Structural Analysis",
-    desc: "TIA-222-H compliant assessment of existing towers under current and future load profiles.",
+    desc: "TIA-222-H I compliant assessment of existing towers under current and future load profiles.",
     details:
       "ATSS provides comprehensive tower structural analysis services to evaluate the overall stability, strength, and safety of telecom towers under existing and proposed loading conditions. Our analysis covers wind loads, seismic forces, equipment additions, and future expansion scenarios in accordance with applicable national and international standards. Using advanced analytical tools and AI-assisted validation, we identify overstressed members, assess reserve capacity, and recommend strengthening solutions to ensure long-term structural reliability and regulatory compliance.",
     code: "01",

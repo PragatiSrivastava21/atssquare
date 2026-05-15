@@ -194,9 +194,15 @@ const Contact = () => {
             className="space-y-6"
           >
             {[
+<<<<<<< HEAD
               { icon: Mail,   label: "Email",  value: "info@atssquare.com" },
               { icon: Phone,  label: "Phone",  value: "+1 (574) 540-9079" },
               { icon: MapPin, label: "Office", value: "1527 Waterleaf Lane, Delray Beach, FL-33446" },
+=======
+              { icon: Mail,   label: "Email",  value: "engineering@atss.com" },
+              { icon: Phone,  label: "Phone",  value: "+1 (555) 234-5678" },
+              { icon: MapPin, label: "Office", value: "1200 Tower Drive, Suite 400\nDallas, TX 75201" },
+>>>>>>> 09c7693e342766a241322bd2257a7abe178008e0
             ].map((c) => {
               const Icon = c.icon;
               return (

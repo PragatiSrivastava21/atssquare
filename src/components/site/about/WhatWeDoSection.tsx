@@ -6,17 +6,17 @@ const services = [
   {
     icon: Activity,
     title: "Tower Structural Analysis",
-    desc: "Comprehensive structural assessment ensuring safety and compliance with international standards.",
+    desc: "Comprehensive structural integrity assessment ensuring safety and compliance with all applicable standards.",
   },
   {
     icon: Settings,
     title: "Fatigue Analysis",
-    desc: "Evaluating long-term material behavior under cyclic loading to prevent structural failure.",
+    desc: "Evaluating long-term structural behavior(including its material and shape) under cyclic loading to prevent structural failure.",
   },
   {
     icon: Layers,
     title: "Foundation Analysis",
-    desc: "Geotechnical-driven foundation review, retrofit and uplift assessment for all tower types.",
+    desc: "Geotechnical-driven foundation review, retrofit and new foundation designs withuplift assessment for all tower types.",
   },
   {
     icon: Antenna,
@@ -26,7 +26,7 @@ const services = [
   {
     icon: Wind,
     title: "FEA / CFD Simulation",
-    desc: "High-fidelity finite element and computational fluid dynamics for wind and seismic events.",
+    desc: "FEA of critical structures to enhance its performance. ENhancing tower longitivity and performance using advanced method like CFD and FEA simulations",
   },
   {
     icon: Building2,
