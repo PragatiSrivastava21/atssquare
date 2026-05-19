@@ -53,12 +53,12 @@ const Blog = () => {
         <div className="absolute inset-0 bg-gradient-to-b from-[hsl(217,67%,7%)/0.7] via-[hsl(217,67%,12%)/0.6] to-background" />
         <div className="absolute inset-0 bg-gradient-to-r from-[hsl(217,67%,7%)/0.5] via-transparent to-transparent" />
 
-        <div className="container-px relative z-10 mx-auto pt-5 pb-20">
+        <div className="container-px relative z-10  pt-5 pb-20">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7 }}
-            className="max-w-3xl"
+            className="max-w-3xl text-left"
           >
             <span className="inline-block rounded-full bg-white px-3 py-1 text-xs font-medium text-primary">
              Blog
@@ -76,7 +76,8 @@ const Blog = () => {
               </span>
             </h1>
             <p className="mt-6 text-lg text-whiteleading-relaxed text-white max-w-2xl">
-              Engineering perspective,industry updates, and technical deep-dives from our team.
+             Insights, engineering perspectives, industry developments, and technical deep-dives from the ATSS team — covering evolving infrastructure standards, structural innovations, wireless network expansion, and the practical challenges shaping modern telecom engineering projects across the industry.
+
             </p>
           </motion.div>
         </div>

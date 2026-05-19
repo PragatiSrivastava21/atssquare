@@ -5,34 +5,48 @@ import { motion } from "framer-motion";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 
 const faqs = [
+
   {
     q: "What services does ATSS provide?",
-    a: "ATSS delivers full-lifecycle telecom tower engineering — structural analysis, modifications design, foundation design, mount analysis, inspections, and decommissioning support — for carriers, tower operators, and infrastructure funds.",
+    a: "ATSS provides end-to-end engineering solutions for wireless infrastructure, including tower structural analysis, structural design and modifications, antenna mount analysis, foundation analysis, finite element analysis (FEA), thermal analysis, corrosion assessment, and 3D structural modelling."
   },
   {
-    q: "Which standards and codes do you follow?",
-    a: "We work to TIA-222 (Rev. G/H), ASCE 7, ACI 318, AISC 360, and applicable local codes. International projects are delivered per Eurocodes, IS 875/802, CSA S37, or other regional standards as required.",
+    q: "What industries does ATSS serve?",
+    a: "ATSS primarily serves the wireless communication industry, focusing on the design, analysis, and optimization of infrastructure such as towers, poles, and related structures. We ensure that these critical components meet and exceed industry standards for safety and performance."
   },
   {
-    q: "What is your typical project turnaround?",
-    a: "Standard structural analyses are delivered in 5–7 business days. Complex modification packages typically take 2–3 weeks. We also offer expedited turnarounds for urgent network rollouts.",
+    q: "How does ATSS ensure the safety and stability of wireless infrastructure?",
+    a: "We utilize advanced software and technologies like Robot Structural Analysis, RISA-3D, TNX Tower, and Mathcad to conduct comprehensive structural analysis and design. These tools allow us to accurately assess the stability and integrity of your infrastructure, ensuring it is built to last and withstand environmental stressors."
   },
   {
-    q: "Do you stamp drawings in all states?",
-    a: "Yes. Our team holds Professional Engineer licenses across all 50 U.S. states and selected international jurisdictions. Stamped deliverables are included with every engineering package.",
+    q: "What sets ATSS apart from other engineering firms?",
+    a: "ATSS is distinguished by our commitment to innovation, precision, and customer satisfaction. We not only provide cutting-edge engineering solutions but also prioritize clear communication, transparency, and on-time delivery. Our deep industry expertise and use of state-of-the-art tools ensure that our clients receive the best possible results."
   },
   {
-    q: "How do you handle revisions?",
-    a: "Each project includes a defined revision allowance. Additional revisions are scoped transparently — no surprise charges. Most clarifications are resolved within one business day.",
+    q: "How does ATSS approach custom engineering projects?",
+    a: "We understand that every project is unique, which is why we offer custom engineering solutions tailored to your specific needs. Our team works closely with you from the initial consultation to the final delivery, ensuring that the solutions we provide are effective, efficient, and within budget."
   },
   {
-    q: "Can ATSS support large portfolio rollouts?",
-    a: "Absolutely. We regularly support multi-thousand-site programs with dedicated project managers, custom workflows, and integration into client tracking systems.",
+    q: "How does ATSS stay ahead of industry trends?",
+    a: "Our commitment to continuous improvement drives us to stay updated with the latest advancements in engineering technology. We regularly adopt new tools and methodologies that enhance our services, ensuring that our clients benefit from the most current and effective solutions available."
   },
   {
-    q: "How do I request a proposal?",
-    a: "Visit our Contact page or email engineering@atss.com with your scope, site count, and timeline. You'll receive a scoped proposal within 3 business days.",
+    q: "What is ATSS's approach to customer communication?",
+    a: "We prioritize clear and transparent communication throughout the project lifecycle. Our team ensures that you are informed and confident at every stage, making it easy to track progress and address any concerns promptly."
   },
+  {
+    q: "How can I get in touch with ATSS for a consultation?",
+    a: "We welcome the opportunity to discuss how we can support your wireless infrastructure needs. You can contact us via [Insert Phone Number], [Insert Email Address], or visit our office at [Insert Physical Address]. We look forward to working with you."
+  },
+  {
+    q: "What values drive ATSS as a company?",
+    a: "ATSS is driven by values of Integrity, Excellence, Innovation, Customer Focus, Sustainability, and Collaboration. These principles guide every aspect of our work, ensuring that we deliver high-quality, reliable engineering solutions while fostering a positive and collaborative work environment."
+  },
+  {
+    q: "Does ATSS offer career opportunities?",
+    a: "Yes, ATSS is always looking to expand our team with talented and motivated individuals. We offer diverse career growth opportunities and a collaborative, supportive work culture. If you’re interested in joining us, please visit our Careers page or contact us directly for more information."
+  }
+
 ];
 
 const Faqs = () => {
@@ -45,7 +59,7 @@ const Faqs = () => {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7 }}
-          className="max-w-3xl"
+         className="max-w-5xl mx-auto text-center"
         >
           <span className="inline-block rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
             Help Center
@@ -54,7 +68,7 @@ const Faqs = () => {
             Frequently asked{" "}
             <span className="text-gradient-hero">questions</span>
           </h1>
-          <p className="mt-6 text-lg text-muted-foreground">
+          <p className="mt-6 text-lg text-slate-600">
             Quick answers about our engineering services, timelines, and process. Can't find what you need? Get in touch.
           </p>
         </motion.div>
@@ -66,7 +80,7 @@ const Faqs = () => {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
-          className="mx-auto max-w-3xl rounded-2xl border border-border bg-card p-4 sm:p-8 shadow-[var(--shadow-card)]"
+          className="mx-auto max-w-5xl rounded-2xl border border-border bg-card p-6 sm:p-10 shadow-[var(--shadow-card)]"
         >
           <Accordion type="single" collapsible className="w-full">
             {faqs.map((f, i) => (
@@ -74,7 +88,7 @@ const Faqs = () => {
                 <AccordionTrigger className="text-left font-display text-base md:text-lg font-semibold hover:no-underline hover:text-primary transition-colors">
                   {f.q}
                 </AccordionTrigger>
-                <AccordionContent className="text-sm md:text-base text-muted-foreground leading-relaxed">
+               <AccordionContent className="text-sm md:text-base text-slate-800 leading-relaxed tracking-wide">
                   {f.a}
                 </AccordionContent>
               </AccordionItem>

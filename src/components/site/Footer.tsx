@@ -1,5 +1,9 @@
 import { Link } from "react-router-dom";
-import { Mail, Phone, MapPin } from "lucide-react";
+import { MapPin, Mail } from "lucide-react";
+
+// ── Import profile pictures ─────────────────────────────────────────────────
+import kentonPhoto from "@/assets/kenton.png";   // replace path as needed
+import niteshPhoto from "@/assets/nitesh.png";     // replace path as needed
 
 const LinkedInIcon = () => (
   <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
@@ -7,18 +11,47 @@ const LinkedInIcon = () => (
   </svg>
 );
 
+interface ContactPersonProps {
+  name: string;
+  email: string;
+  photo: string;
+}
+
+function ContactPerson({ name, email, photo }: ContactPersonProps) {
+  return (
+    <div className="flex items-center gap-2">
+      <Mail className="w-4 h-4 shrink-0" style={{ color: "#cbd8ee" }} />
+      <img src={photo} alt={name} style={{ height: 25, verticalAlign: "middle", mixBlendMode: "screen" }} />
+    </div>
+  );
+}
+
 const Footer = () => {
   return (
-    <footer className="relative overflow-hidden pb-4 pt-36" style={{ background: "linear-gradient(to bottom, #ffffff 0%, #d0ddf0 8%, #7a9fd4 18%, #2e5fa3 30%, #1a3a6b 45%, #0f2451 70%, #091a3d 100%)" }}>
-      <div className="relative container-px mx-auto grid gap-8 md:grid-cols-4" style={{ color: "#ffffff" }}>
-
+    <footer
+      className="relative overflow-hidden pb-4 pt-36"
+      style={{
+        background:
+          "linear-gradient(to bottom, #ffffff 0%, #d0ddf0 8%, #7a9fd4 18%, #2e5fa3 30%, #1a3a6b 45%, #0f2451 70%, #091a3d 100%)",
+      }}
+    >
+      <div
+        className="relative container-px mx-auto grid gap-8 md:grid-cols-4"
+        style={{ color: "#ffffff" }}
+      >
         {/* Brand */}
         <div className="space-y-3">
           <Link to="/" className="flex items-center gap-2.5">
-            <img src="/ats2-logo.png" alt="ATS²" className="h-10 w-auto object-contain" />
+            <img
+              src="/ats2-logo.png"
+              alt="ATS²"
+              className="h-10 w-auto object-contain"
+            />
           </Link>
           <p className="text-sm max-w-[18rem]" style={{ color: "#cbd8ee" }}>
-            Advanced Tower Structural Solutions — At ATSS, we are dedicated to delivering engineering solutions that ensure the safety, stability, and performance of your wireless infrastructure.
+            Advanced Tower Structural Solutions — At ATSS, we are dedicated to
+            delivering engineering solutions that ensure the safety, stability,
+            and performance of your wireless infrastructure.
           </p>
         </div>
 
@@ -43,7 +76,6 @@ const Footer = () => {
             <li><Link to="/faqs" className="hover:text-white transition-colors">FAQs</Link></li>
             <li><Link to="/terms" className="hover:text-white transition-colors">Terms and Conditions</Link></li>
           </ul>
-          {/* LinkedIn under Resources */}
           <div className="mt-4">
             <a
               href="https://www.linkedin.com/company/advanced-tower-structural-solutions-atss/"
@@ -60,27 +92,28 @@ const Footer = () => {
 
         {/* Contact */}
         <div>
-          <h4 className="mb-3 text-sm font-semibold text-white">Contact</h4>
-          <div className="text-sm flex flex-col gap-3" style={{ color: "#cbd8ee" }}>
-            <a
-              href="mailto:kwallace@atssquare.com"
-              className="flex items-center gap-2 hover:text-white transition-colors"
-            >
-              <Mail className="w-4 h-4 shrink-0" />
-              kwallace@atssquare.com
-            </a>
-            <a
-              href="tel:+15745409079"
-              className="flex items-center gap-2 hover:text-white transition-colors"
-            >
-              <Phone className="w-4 h-4 shrink-0" />
-              +1 (574) 540-9079
-            </a>
+          <h3 className="mb-4 text-sm font-semibold text-white">Contact</h3>
+          
+          <div className="flex flex-col gap-4">
+             <h3 className="text-sm font-semibold text-white">Kenton Wallace</h3>
+            <ContactPerson
+              name="Kenton Wallace"
+              email="kwallace@atssquare.com"
+              photo={kentonPhoto}
+            />
+             <h3 className=" text-sm font-semibold text-white">Nitesh Ahuja</h3>
+            <ContactPerson
+              name="Nitesh Ahuja"
+              email="niteshahuja@atssquare.com"
+              photo={niteshPhoto}
+            />
+
             <a
               href="https://maps.google.com/?q=Delray+Beach+FL+33446"
               target="_blank"
               rel="noreferrer"
-              className="flex items-center gap-2 hover:text-white transition-colors"
+              className="flex items-center gap-2 hover:text-white transition-colors text-sm"
+              style={{ color: "#cbd8ee" }}
             >
               <MapPin className="w-4 h-4 shrink-0" />
               Delray Beach, FL-33446
@@ -89,14 +122,29 @@ const Footer = () => {
         </div>
 
         {/* Bottom Bar */}
-        <div className="md:col-span-4 pt-6 flex flex-col md:flex-row items-center justify-between gap-4" style={{ borderTop: "1px solid rgba(255,255,255,0.2)" }}>
-          <div className="text-xs" style={{ color: "#cbd8ee" }}>© {new Date().getFullYear()} ATSS Engineering. All rights reserved.</div>
+        <div
+          className="md:col-span-4 pt-6 flex flex-col md:flex-row items-center justify-between gap-4"
+          style={{ borderTop: "1px solid rgba(255,255,255,0.2)" }}
+        >
+          <div className="text-xs" style={{ color: "#cbd8ee" }}>
+            © {new Date().getFullYear()} ATSS Engineering. All rights reserved.
+          </div>
           <div className="text-center">
-            <h3 className="text-white">Designed by Pragati Srivastava</h3>
-            <h4 className="text-sm mt-1" style={{ color: "#8fa8d0" }}>pragatisri21@gmail.com</h4>
+            <h3 className="text-white">Designed by P.S</h3>
+            <h4 className="text-sm mt-1" style={{ color: "#8fa8d0" }}>
+              <a
+              href="https://www.linkedin.com/in/pragati-srivastava-b41816265/"
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-2 hover:text-white transition-colors"
+              style={{ color: "#cbd8ee" }}
+            >
+              <LinkedInIcon />
+              <span>LinkedIn</span>
+              </a>
+            </h4>
           </div>
         </div>
-
       </div>
     </footer>
   );

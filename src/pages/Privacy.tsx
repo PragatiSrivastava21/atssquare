@@ -7,41 +7,65 @@ import { Shield, Database, Cookie, Share2, Lock, UserCheck, Mail } from "lucide-
 const sections = [
   {
     icon: Database,
-    title: "1. Information We Collect",
-    body: "We collect information you provide directly — such as name, email, company, and project details when you contact us, request a proposal, or subscribe to updates. We also collect limited technical data (IP address, browser type, device, and usage patterns) automatically through our site.",
+    title: "1. Introduction",
+    body:
+      "ATSS is committed to protecting the privacy and security of your personal information. This Privacy Policy outlines how we collect, use, disclose, and safeguard your information when you visit our website and use our services. By accessing our website or engaging with our services, you consent to the practices described in this policy.",
+  },
+  {
+    icon: Database,
+    title: "2. Information We Collect",
+    body:
+      "We may collect personal information such as your name, email address, phone number, and company details when you contact us, request a quote, or engage our services. We also collect technical information such as IP address, browser type, operating system, and website usage data. Our website may use cookies to enhance user experience and track visitor behavior.",
   },
   {
     icon: Shield,
-    title: "2. How We Use Your Data",
-    body: "Your information helps us respond to inquiries, deliver engineering services, send relevant updates, improve our website, and comply with legal obligations. We never sell personal data and use it strictly for legitimate business purposes.",
-  },
-  {
-    icon: Cookie,
-    title: "3. Cookies & Tracking",
-    body: "We use cookies and similar technologies to remember preferences, analyze traffic, and improve performance. You can control cookies through your browser settings. Disabling cookies may limit some site functionality.",
+    title: "3. How We Use Your Information",
+    body:
+      "We use your data to deliver engineering services, respond to inquiries, process requests, communicate updates, improve website performance, and comply with legal obligations.",
   },
   {
     icon: Share2,
-    title: "4. Third-Party Services",
-    body: "We may share limited data with trusted service providers (hosting, analytics, email delivery) who are bound by confidentiality. We do not sell or rent your personal information to third parties for marketing purposes.",
+    title: "4. Information Sharing and Disclosure",
+    body:
+      "We do not sell or rent personal data. We may share information with service providers, legal authorities when required, or during business transfers such as mergers or acquisitions.",
   },
   {
     icon: Lock,
     title: "5. Data Security",
-    body: "We apply industry-standard administrative, technical, and physical safeguards to protect your information. While no system is completely secure, we continuously review and strengthen our security posture.",
+    body:
+      "We implement technical and organizational security measures to protect your data, but no system is completely secure.",
+  },
+  {
+    icon: Database,
+    title: "6. Data Retention",
+    body:
+      "We retain personal data only as long as necessary for business or legal purposes and securely delete or anonymize it afterward.",
   },
   {
     icon: UserCheck,
-    title: "6. Your Rights",
-    body: "You have the right to access, correct, update, or request deletion of your personal data. You may also opt out of marketing communications at any time by contacting us or using the unsubscribe link in our emails.",
+    title: "7. Your Rights",
+    body:
+      "You may request access, correction, deletion, or restriction of your personal data and withdraw consent at any time.",
+  },
+  {
+    icon: Share2,
+    title: "8. Third-Party Links",
+    body:
+      "Our website may contain links to external websites. We are not responsible for their privacy practices.",
+  },
+  {
+    icon: Shield,
+    title: "9. Changes to This Policy",
+    body:
+      "We may update this Privacy Policy at any time. Changes will be effective immediately after posting.",
   },
   {
     icon: Mail,
-    title: "7. Contact Us",
-    body: "For privacy questions or requests, email engineering@atss.com or write to us at 1200 Tower Drive, Suite 400, Dallas, TX 75201. We aim to respond within one business day.",
+    title: "10. Contact Information",
+    body:
+      "Phone: +1-574540-9079 | Email: info@atssquare.com | Address: 1527 Waterleaf Lane, Delray Beach, FL-33446",
   },
 ];
-
 const Privacy = () => {
   useLenis();
   return (
@@ -52,7 +76,7 @@ const Privacy = () => {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7 }}
-          className="max-w-3xl"
+           className="max-w-5xl mx-auto text-center"
         >
           <span className="inline-block rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
             Legal
@@ -60,7 +84,7 @@ const Privacy = () => {
           <h1 className="mt-5 font-display text-4xl font-semibold tracking-tight md:text-6xl">
             Privacy <span className="text-gradient-hero">Policy</span>
           </h1>
-          <p className="mt-6 text-lg text-muted-foreground">
+          <p className="mt-6 text-lg text-slate-800">
             How ATSS collects, uses, and protects your information. Last updated: January 2026.
           </p>
         </motion.div>
@@ -85,7 +109,7 @@ const Privacy = () => {
                   </div>
                   <div>
                     <h2 className="font-display text-xl font-semibold">{s.title}</h2>
-                    <p className="mt-2 text-sm text-muted-foreground leading-relaxed">{s.body}</p>
+                    <p className="mt-2 text-sm text-slate-800 leading-relaxed">{s.body}</p>
                   </div>
                 </div>
               </motion.article>

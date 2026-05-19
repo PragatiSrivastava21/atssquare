@@ -2,483 +2,248 @@
 // Dependencies: npm install leaflet react-leaflet @types/leaflet recharts
 
 import { useState, useEffect } from "react";
-import { MapContainer, TileLayer, Marker, Popup, useMap, MapContainerProps } from "react-leaflet";
-import type { Map as LeafletMap } from "leaflet";
+import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import { PieChart, Pie, Cell, Tooltip } from "recharts";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 
-// ── Fix Leaflet default marker icons broken by bundlers ────────────────────
-// (Vite / webpack can't resolve the default marker PNG paths at runtime)
 delete (L.Icon.Default.prototype as any)._getIconUrl;
 L.Icon.Default.mergeOptions({
   iconRetinaUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png",
-  iconUrl:       "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
-  shadowUrl:     "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
+  iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
+  shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
 });
 
-// ── Types ──────────────────────────────────────────────────────────────────
-interface WorkItem {
-  label: string;
-  pct: number;
-  color: string;
+interface ServiceItem { label: string; count: number; }
+interface StateData {
+  id: string; state: string; abbr: string;
+  lat: number; lng: number; total: number;
+  services: ServiceItem[];
 }
 
-interface Tower {
-  id: number;
-  state: string;
-  lat: number;
-  lng: number;
-  name: string;
-  location: string;
-  height: string;
-  year: number;
-  team: number;
-  duration: string;
-  status: "completed" | "ongoing";
-  work: WorkItem[];
+function groupSAServices(services: ServiceItem[]): ServiceItem[] {
+  const saGroup: ServiceItem = { label: "SA (All Types)", count: 0 };
+  const others: ServiceItem[] = [];
+  for (const s of services) {
+    const lbl = s.label.toLowerCase();
+    if (lbl.includes("sa") || lbl.includes("structural analysis")) {
+      saGroup.count += s.count;
+    } else {
+      others.push(s);
+    }
+  }
+  const result: ServiceItem[] = [];
+  if (saGroup.count > 0) result.push(saGroup);
+  return [...result, ...others];
 }
 
-// ── Data ───────────────────────────────────────────────────────────────────
-const towers: Tower[] = [
-  {
-    id: 1, state: "Alabama", lat: 33.5186, lng: -86.8104,
-    name: "Tower Alpha", location: "Birmingham, AL", height: "180 m",
-    year: 2021, team: 8, duration: "6 wks", status: "completed",
-    work: [
-      { label: "Structural", pct: 38, color: "#185FA5" },
-      { label: "Foundation", pct: 22, color: "#1D9E75" },
-      { label: "Fatigue",    pct: 18, color: "#BA7517" },
-      { label: "Antenna",    pct: 14, color: "#993C1D" },
-      { label: "FEA/CFD",   pct: 8,  color: "#534AB7" },
-    ],
-  },
-  {
-    id: 2, state: "Connecticut", lat: 41.7658, lng: -72.6851,
-    name: "Tower Beta", location: "Hartford, CT", height: "215 m",
-    year: 2022, team: 11, duration: "9 wks", status: "completed",
-    work: [
-      { label: "Structural", pct: 30, color: "#185FA5" },
-      { label: "FEA/CFD",   pct: 28, color: "#534AB7" },
-      { label: "Foundation", pct: 20, color: "#1D9E75" },
-      { label: "Antenna",    pct: 12, color: "#993C1D" },
-      { label: "Fatigue",    pct: 10, color: "#BA7517" },
-    ],
-  },
-  {
-    id: 3, state: "Georgia", lat: 33.749, lng: -84.388,
-    name: "Tower Gamma", location: "Atlanta, GA", height: "145 m",
-    year: 2023, team: 6, duration: "4 wks", status: "ongoing",
-    work: [
-      { label: "Structural", pct: 45, color: "#185FA5" },
-      { label: "Antenna",    pct: 25, color: "#993C1D" },
-      { label: "Foundation", pct: 18, color: "#1D9E75" },
-      { label: "Fatigue",    pct: 12, color: "#BA7517" },
-    ],
-  },
-  {
-    id: 4, state: "Indiana", lat: 39.7684, lng: -86.1581,
-    name: "Tower Delta", location: "Indianapolis, IN", height: "160 m",
-    year: 2022, team: 9, duration: "7 wks", status: "completed",
-    work: [
-      { label: "Structural", pct: 32, color: "#185FA5" },
-      { label: "Foundation", pct: 26, color: "#1D9E75" },
-      { label: "FEA/CFD",   pct: 22, color: "#534AB7" },
-      { label: "Antenna",    pct: 12, color: "#993C1D" },
-      { label: "Fatigue",    pct: 8,  color: "#BA7517" },
-    ],
-  },
-  {
-    id: 5, state: "Iowa", lat: 41.5868, lng: -93.625,
-    name: "Tower Epsilon", location: "Des Moines, IA", height: "195 m",
-    year: 2023, team: 13, duration: "11 wks", status: "ongoing",
-    work: [
-      { label: "FEA/CFD",   pct: 30, color: "#534AB7" },
-      { label: "Structural", pct: 28, color: "#185FA5" },
-      { label: "Foundation", pct: 22, color: "#1D9E75" },
-      { label: "Fatigue",    pct: 12, color: "#BA7517" },
-      { label: "Antenna",    pct: 8,  color: "#993C1D" },
-    ],
-  },
-  {
-    id: 6, state: "Kentucky", lat: 38.2527, lng: -85.7585,
-    name: "Tower Zeta", location: "Louisville, KY", height: "170 m",
-    year: 2021, team: 7, duration: "5 wks", status: "completed",
-    work: [
-      { label: "Structural", pct: 40, color: "#185FA5" },
-      { label: "Fatigue",    pct: 24, color: "#BA7517" },
-      { label: "Antenna",    pct: 20, color: "#993C1D" },
-      { label: "Foundation", pct: 16, color: "#1D9E75" },
-    ],
-  },
-  {
-    id: 7, state: "Maine", lat: 43.6615, lng: -70.2553,
-    name: "Tower Eta", location: "Portland, ME", height: "200 m",
-    year: 2024, team: 10, duration: "8 wks", status: "ongoing",
-    work: [
-      { label: "FEA/CFD",   pct: 35, color: "#534AB7" },
-      { label: "Structural", pct: 30, color: "#185FA5" },
-      { label: "Foundation", pct: 20, color: "#1D9E75" },
-      { label: "Antenna",    pct: 15, color: "#993C1D" },
-    ],
-  },
-  {
-    id: 8, state: "Maryland", lat: 39.2904, lng: -76.6122,
-    name: "Tower Theta", location: "Baltimore, MD", height: "155 m",
-    year: 2022, team: 8, duration: "6 wks", status: "completed",
-    work: [
-      { label: "Structural", pct: 35, color: "#185FA5" },
-      { label: "Foundation", pct: 25, color: "#1D9E75" },
-      { label: "FEA/CFD",   pct: 20, color: "#534AB7" },
-      { label: "Fatigue",    pct: 12, color: "#BA7517" },
-      { label: "Antenna",    pct: 8,  color: "#993C1D" },
-    ],
-  },
-  {
-    id: 9, state: "Michigan", lat: 42.3314, lng: -83.0458,
-    name: "Tower Iota", location: "Detroit, MI", height: "188 m",
-    year: 2023, team: 9, duration: "7 wks", status: "ongoing",
-    work: [
-      { label: "Structural", pct: 33, color: "#185FA5" },
-      { label: "FEA/CFD",   pct: 27, color: "#534AB7" },
-      { label: "Foundation", pct: 22, color: "#1D9E75" },
-      { label: "Antenna",    pct: 18, color: "#993C1D" },
-    ],
-  },
-  {
-    id: 10, state: "Minnesota", lat: 44.9778, lng: -93.265,
-    name: "Tower Kappa", location: "Minneapolis, MN", height: "175 m",
-    year: 2021, team: 10, duration: "8 wks", status: "completed",
-    work: [
-      { label: "Structural", pct: 38, color: "#185FA5" },
-      { label: "Foundation", pct: 24, color: "#1D9E75" },
-      { label: "Fatigue",    pct: 20, color: "#BA7517" },
-      { label: "Antenna",    pct: 18, color: "#993C1D" },
-    ],
-  },
-  {
-    id: 11, state: "Mississippi", lat: 32.2988, lng: -90.1848,
-    name: "Tower Lambda", location: "Jackson, MS", height: "162 m",
-    year: 2022, team: 7, duration: "5 wks", status: "ongoing",
-    work: [
-      { label: "FEA/CFD",   pct: 32, color: "#534AB7" },
-      { label: "Structural", pct: 28, color: "#185FA5" },
-      { label: "Foundation", pct: 22, color: "#1D9E75" },
-      { label: "Fatigue",    pct: 18, color: "#BA7517" },
-    ],
-  },
-  {
-    id: 12, state: "Missouri", lat: 38.627, lng: -90.1994,
-    name: "Tower Mu", location: "St. Louis, MO", height: "178 m",
-    year: 2023, team: 11, duration: "9 wks", status: "completed",
-    work: [
-      { label: "Structural", pct: 36, color: "#185FA5" },
-      { label: "Foundation", pct: 26, color: "#1D9E75" },
-      { label: "FEA/CFD",   pct: 20, color: "#534AB7" },
-      { label: "Fatigue",    pct: 10, color: "#BA7517" },
-      { label: "Antenna",    pct: 8,  color: "#993C1D" },
-    ],
-  },
-  {
-    id: 13, state: "New Hampshire", lat: 42.9956, lng: -71.4548,
-    name: "Tower Nu", location: "Manchester, NH", height: "192 m",
-    year: 2024, team: 8, duration: "6 wks", status: "ongoing",
-    work: [
-      { label: "Structural", pct: 42, color: "#185FA5" },
-      { label: "FEA/CFD",   pct: 28, color: "#534AB7" },
-      { label: "Foundation", pct: 18, color: "#1D9E75" },
-      { label: "Antenna",    pct: 12, color: "#993C1D" },
-    ],
-  },
-  {
-    id: 14, state: "North Carolina", lat: 35.2271, lng: -80.8431,
-    name: "Tower Xi", location: "Charlotte, NC", height: "168 m",
-    year: 2021, team: 9, duration: "7 wks", status: "completed",
-    work: [
-      { label: "Structural", pct: 34, color: "#185FA5" },
-      { label: "Foundation", pct: 24, color: "#1D9E75" },
-      { label: "Fatigue",    pct: 22, color: "#BA7517" },
-      { label: "FEA/CFD",   pct: 12, color: "#534AB7" },
-      { label: "Antenna",    pct: 8,  color: "#993C1D" },
-    ],
-  },
-  {
-    id: 15, state: "Ohio", lat: 39.9612, lng: -82.9988,
-    name: "Tower Omicron", location: "Columbus, OH", height: "185 m",
-    year: 2022, team: 10, duration: "8 wks", status: "completed",
-    work: [
-      { label: "Structural", pct: 36, color: "#185FA5" },
-      { label: "FEA/CFD",   pct: 26, color: "#534AB7" },
-      { label: "Foundation", pct: 20, color: "#1D9E75" },
-      { label: "Fatigue",    pct: 12, color: "#BA7517" },
-      { label: "Antenna",    pct: 6,  color: "#993C1D" },
-    ],
-  },
-  {
-    id: 16, state: "Oklahoma", lat: 35.4676, lng: -97.5164,
-    name: "Tower Pi", location: "Oklahoma City, OK", height: "172 m",
-    year: 2023, team: 8, duration: "6 wks", status: "ongoing",
-    work: [
-      { label: "FEA/CFD",   pct: 33, color: "#534AB7" },
-      { label: "Structural", pct: 29, color: "#185FA5" },
-      { label: "Foundation", pct: 22, color: "#1D9E75" },
-      { label: "Antenna",    pct: 16, color: "#993C1D" },
-    ],
-  },
-  {
-    id: 17, state: "South Carolina", lat: 34.0007, lng: -81.0348,
-    name: "Tower Rho", location: "Columbia, SC", height: "158 m",
-    year: 2021, team: 7, duration: "5 wks", status: "completed",
-    work: [
-      { label: "Structural", pct: 40, color: "#185FA5" },
-      { label: "Foundation", pct: 22, color: "#1D9E75" },
-      { label: "Fatigue",    pct: 20, color: "#BA7517" },
-      { label: "Antenna",    pct: 18, color: "#993C1D" },
-    ],
-  },
-  {
-    id: 18, state: "Tennessee", lat: 36.1627, lng: -86.7816,
-    name: "Tower Sigma", location: "Nashville, TN", height: "165 m",
-    year: 2022, team: 9, duration: "7 wks", status: "ongoing",
-    work: [
-      { label: "Structural", pct: 38, color: "#185FA5" },
-      { label: "FEA/CFD",   pct: 25, color: "#534AB7" },
-      { label: "Foundation", pct: 20, color: "#1D9E75" },
-      { label: "Fatigue",    pct: 17, color: "#BA7517" },
-    ],
-  },
-  {
-    id: 19, state: "Texas", lat: 32.7767, lng: -96.797,
-    name: "Tower Tau", location: "Dallas, TX", height: "210 m",
-    year: 2023, team: 14, duration: "12 wks", status: "ongoing",
-    work: [
-      { label: "Structural", pct: 32, color: "#185FA5" },
-      { label: "FEA/CFD",   pct: 28, color: "#534AB7" },
-      { label: "Foundation", pct: 20, color: "#1D9E75" },
-      { label: "Fatigue",    pct: 12, color: "#BA7517" },
-      { label: "Antenna",    pct: 8,  color: "#993C1D" },
-    ],
-  },
-  {
-    id: 20, state: "Virginia", lat: 37.5407, lng: -77.436,
-    name: "Tower Upsilon", location: "Richmond, VA", height: "177 m",
-    year: 2021, team: 8, duration: "6 wks", status: "completed",
-    work: [
-      { label: "Structural", pct: 36, color: "#185FA5" },
-      { label: "Foundation", pct: 24, color: "#1D9E75" },
-      { label: "FEA/CFD",   pct: 22, color: "#534AB7" },
-      { label: "Fatigue",    pct: 12, color: "#BA7517" },
-      { label: "Antenna",    pct: 6,  color: "#993C1D" },
-    ],
-  },
-  {
-    id: 21, state: "West Virginia", lat: 38.3498, lng: -81.6326,
-    name: "Tower Phi", location: "Charleston, WV", height: "168 m",
-    year: 2022, team: 7, duration: "5 wks", status: "completed",
-    work: [
-      { label: "Structural", pct: 38, color: "#185FA5" },
-      { label: "Foundation", pct: 26, color: "#1D9E75" },
-      { label: "Fatigue",    pct: 18, color: "#BA7517" },
-      { label: "Antenna",    pct: 12, color: "#993C1D" },
-      { label: "FEA/CFD",   pct: 6,  color: "#534AB7" },
-    ],
-  },
-  {
-    id: 22, state: "Wisconsin", lat: 43.0389, lng: -87.9065,
-    name: "Tower Chi", location: "Milwaukee, WI", height: "183 m",
-    year: 2024, team: 10, duration: "8 wks", status: "ongoing",
-    work: [
-      { label: "FEA/CFD",   pct: 34, color: "#534AB7" },
-      { label: "Structural", pct: 28, color: "#185FA5" },
-      { label: "Foundation", pct: 22, color: "#1D9E75" },
-      { label: "Fatigue",    pct: 16, color: "#BA7517" },
-    ],
-  },
-  {
-    id: 23, state: "Florida", lat: 25.7617, lng: -80.1918,
-    name: "Tower Psi", location: "Miami, FL", height: "195 m",
-    year: 2023, team: 13, duration: "11 wks", status: "ongoing",
-    work: [
-      { label: "FEA/CFD",   pct: 30, color: "#534AB7" },
-      { label: "Structural", pct: 28, color: "#185FA5" },
-      { label: "Foundation", pct: 22, color: "#1D9E75" },
-      { label: "Fatigue",    pct: 12, color: "#BA7517" },
-      { label: "Antenna",    pct: 8,  color: "#993C1D" },
-    ],
-  },
+const rawStateData: StateData[] = [
+  { id: "AL", state: "Alabama", abbr: "AL", lat: 33.5186, lng: -86.8104, total: 24,
+    services: [{ label: "Full SA", count: 5 }, { label: "Passing SA", count: 5 }, { label: "Mod SA", count: 4 }, { label: "Mod Drawing", count: 3 }, { label: "SA Review", count: 2 }, { label: "Failing SA", count: 2 }, { label: "Closeout Report", count: 1 }, { label: "Tower Inspection Report", count: 1 }, { label: "Re-run", count: 1 }] },
+  { id: "MO", state: "Missouri", abbr: "MO", lat: 38.627, lng: -90.1994, total: 25,
+    services: [{ label: "Full SA", count: 8 }, { label: "Passing SA", count: 7 }, { label: "SA Review", count: 7 }, { label: "Mod SA", count: 2 }, { label: "Mod Drawing", count: 1 }, { label: "Failing SA", count: 1 }, { label: "SBA Re-run", count: 2 }] },
+  { id: "SC", state: "South Carolina", abbr: "SC", lat: 34.0007, lng: -81.0348, total: 20,
+    services: [{ label: "Full SA", count: 4 }, { label: "Passing SA", count: 3 }, { label: "Mod SA", count: 3 }, { label: "Mod Drawing", count: 2 }, { label: "Failing SA", count: 2 }, { label: "SBA SA Re-run", count: 2 }, { label: "SA Review", count: 1 }, { label: "Closeout Report", count: 1 }, { label: "Tower Inspection Report", count: 1 }, { label: "Rerun SA", count: 1 }] },
+  { id: "IA", state: "Iowa", abbr: "IA", lat: 41.5868, lng: -93.625, total: 18,
+    services: [{ label: "Passing SA", count: 13 }, { label: "Full SA", count: 2 }, { label: "Mod SA", count: 1 }, { label: "Mod Drawing", count: 1 }, { label: "Failing SA", count: 1 }] },
+  { id: "MS", state: "Mississippi", abbr: "MS", lat: 32.2988, lng: -90.1848, total: 17,
+    services: [{ label: "Mod SA", count: 4 }, { label: "Mod Drawing", count: 4 }, { label: "Full SA", count: 3 }, { label: "Failing SA", count: 3 }, { label: "Passing SA", count: 1 }, { label: "Closeout Report", count: 1 }, { label: "Tower Inspection Report", count: 1 }] },
+  { id: "GA", state: "Georgia", abbr: "GA", lat: 33.749, lng: -84.388, total: 16,
+    services: [{ label: "Passing SA", count: 6 }, { label: "Full SA", count: 4 }, { label: "SA Review", count: 3 }, { label: "Guyed Tower Analysis / Reviews", count: 3 }] },
+  { id: "OK", state: "Oklahoma", abbr: "OK", lat: 35.4676, lng: -97.5164, total: 14,
+    services: [{ label: "SA Review", count: 12 }, { label: "Full SA", count: 2 }, { label: "Passing SA", count: 1 }] },
+  { id: "MI", state: "Michigan", abbr: "MI", lat: 42.3314, lng: -83.0458, total: 12,
+    services: [{ label: "SA Review", count: 8 }, { label: "Full SA", count: 3 }, { label: "Passing SA", count: 1 }] },
+  { id: "TN", state: "Tennessee", abbr: "TN", lat: 36.1627, lng: -86.7816, total: 10,
+    services: [{ label: "Mod SA", count: 3 }, { label: "Full SA", count: 2 }, { label: "Mod Drawing", count: 2 }, { label: "SBA SA Re-run", count: 1 }, { label: "Failing SA", count: 1 }, { label: "Closeout Report", count: 1 }] },
+  { id: "MN", state: "Minnesota", abbr: "MN", lat: 44.9778, lng: -93.265, total: 8,
+    services: [{ label: "Passing SA", count: 7 }, { label: "SA Review", count: 1 }] },
+  { id: "WI", state: "Wisconsin", abbr: "WI", lat: 43.0389, lng: -87.9065, total: 6,
+    services: [{ label: "SA Review", count: 3 }, { label: "Full SA", count: 2 }, { label: "Passing SA", count: 1 }] },
+  { id: "IN", state: "Indiana", abbr: "IN", lat: 39.7684, lng: -86.1581, total: 5,
+    services: [{ label: "SA Review", count: 5 }] },
+  { id: "KY", state: "Kentucky", abbr: "KY", lat: 38.2527, lng: -85.7585, total: 5,
+    services: [{ label: "Mount Analysis", count: 2 }, { label: "Passing SA", count: 2 }, { label: "Failing SA", count: 1 }] },
+  { id: "OH", state: "Ohio", abbr: "OH", lat: 39.9612, lng: -82.9988, total: 4,
+    services: [{ label: "Preliminary Design", count: 3 }, { label: "Full SA / Tower Analysis", count: 1 }] },
+  { id: "ME", state: "Maine", abbr: "ME", lat: 43.6615, lng: -70.2553, total: 4,
+    services: [{ label: "SA Review", count: 3 }, { label: "Full SA", count: 1 }] },
+  { id: "VA", state: "Virginia", abbr: "VA", lat: 37.5407, lng: -77.436, total: 3,
+    services: [{ label: "Full SA / Monopole Analysis", count: 3 }] },
+  { id: "TX", state: "Texas", abbr: "TX", lat: 32.7767, lng: -96.797, total: 1,
+    services: [{ label: "SA Review", count: 1 }] },
+  { id: "CA", state: "California", abbr: "CA", lat: 36.7783, lng: -119.4179, total: 1,
+    services: [{ label: "Preliminary Design", count: 1 }] },
+  { id: "AZ", state: "Arizona", abbr: "AZ", lat: 33.4484, lng: -112.074, total: 1,
+    services: [{ label: "Full SA", count: 1 }] },
+  { id: "FL", state: "Florida", abbr: "FL", lat: 27.9944, lng: -81.7603, total: 1,
+    services: [{ label: "Full SA", count: 1 }] },
+  { id: "NC", state: "North Carolina", abbr: "NC", lat: 35.2271, lng: -80.8431, total: 1,
+    services: [{ label: "Full SA", count: 1 }] },
+    { id: "FL", state: "Florida", abbr: "FL", lat: 27.9944, lng: -81.7603, total: 1,
+    services: [{ label: "Full SA", count: 1 }] },
+     { id: "WV", state: "West Virginia", abbr: "WV", lat: 38.5976, lng: -80.4549, total: 1,
+    services: [{ label: "Full SA", count: 1 }] },
+     { id: "VA", state: "Virginia", abbr: "VA", lat: 37.5407, lng: -77.436, total: 1,
+    services: [{ label: "Full SA", count: 1 }] },
+     { id: "TX", state: "Texas", abbr: "TX", lat: 32.7767, lng: -96.797, total: 1,
+    services: [{ label: "Full SA", count: 1 }] },
+     { id: "KY", state: "Kentucky", abbr: "KY", lat: 38.2527, lng: -85.7585, total: 1,
+    services: [{ label: "Full SA", count: 1 }] },
+     { id: "NC", state: "North Carolina", abbr: "NC", lat: 35.2271, lng: -80.8431, total: 1,
+    services: [{ label: "Full SA", count: 1 }] },
 ];
 
-// ── Custom Leaflet Icon factory ────────────────────────────────────────────
-function makeIcon(tower: Tower, isActive: boolean): L.DivIcon {
-  const bg = tower.status === "ongoing" ? "#BA7517" : "#185FA5";
-  const ring = tower.status === "ongoing" ? "rgba(186,117,23,0.25)" : "rgba(24,95,165,0.22)";
-  const border = isActive ? "3px solid #fff" : "2.5px solid #fff";
-  const size = isActive ? 34 : 30;
-  const shadow = isActive
-    ? `0 0 0 3px ${bg}55, 0 4px 14px rgba(0,0,0,0.35)`
-    : `0 2px 8px rgba(0,0,0,0.28)`;
+const stateData: StateData[] = rawStateData.map(s => ({
+  ...s,
+  services: groupSAServices(s.services),
+}));
 
-  const html = `
-    <div style="
-      position:relative;
-      width:${size}px;
-      height:${size}px;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-    ">
-      ${isActive ? `<div style="
-        position:absolute;
-        inset:-8px;
-        border-radius:50%;
-        background:${ring};
-        animation:towerPulse 2.2s ease-out infinite;
-      "></div>` : ""}
-      <div style="
-        position:relative;
-        width:${size}px;
-        height:${size}px;
-        border-radius:50%;
-        background:${bg};
-        border:${border};
-        box-shadow:${shadow};
-        display:flex;
-        align-items:center;
-        justify-content:center;
-        font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
-        font-size:${isActive ? 11 : 10}px;
-        font-weight:700;
-        color:#fff;
-        transition:all 0.2s;
-        cursor:pointer;
-      ">${tower.id}</div>
-    </div>
-  `;
+// ── Marker helpers (unchanged) ──────────────────────────────────────────────
 
-  return L.divIcon({
-    html,
-    className: "",
-    iconSize: [size + 16, size + 16],
-    iconAnchor: [(size + 16) / 2, (size + 16) / 2],
-    popupAnchor: [0, -(size / 2 + 8)],
-  });
+function getMarkerTier(total: number) {
+  if (total >= 20) return { size: 42, ring: true };
+  if (total >= 10) return { size: 36, ring: false };
+  if (total >= 5)  return { size: 30, ring: false };
+  return { size: 24, ring: false };
 }
 
-// ── Set initial view (works with react-leaflet v4 which dropped center/zoom props) ──
+function getTierColor(total: number) {
+  if (total >= 20) return "#185FA5";
+  if (total >= 10) return "#1D9E75";
+  if (total >= 5)  return "#BA7517";
+  return "#57194f";
+}
+
+function makeIcon(s: StateData, isActive: boolean): L.DivIcon {
+  const { size, ring } = getMarkerTier(s.total);
+  const color = isActive ? "#e8c84a" : getTierColor(s.total);
+  const sz = isActive ? size + 4 : size;
+  const html = `<div style="position:relative;width:${sz+16}px;height:${sz+16}px;display:flex;align-items:center;justify-content:center;">
+    ${ring || isActive ? `<div style="position:absolute;inset:-6px;border-radius:50%;background:${color}33;animation:towerPulse 2.4s ease-out infinite;"></div>` : ""}
+    <div style="position:relative;width:${sz}px;height:${sz}px;border-radius:50%;background:${color};border:${isActive?"3px solid #fff":"2.5px solid rgba(255,255,255,0.85)"};box-shadow:${isActive?`0 0 0 3px ${color}66,0 6px 20px rgba(0,0,0,0.4)`:"0 2px 10px rgba(0,0,0,0.3)"};display:flex;align-items:center;justify-content:center;flex-direction:column;cursor:pointer;">
+      <span style="font-size:${sz>=38?11:9}px;font-weight:800;color:#fff;line-height:1.1;">${s.abbr}</span>
+      <span style="font-size:${sz>=38?10:8}px;font-weight:600;color:rgba(255,255,255,0.85);line-height:1.1;">${s.total}+</span>
+    </div>
+  </div>`;
+  return L.divIcon({ html, className: "", iconSize: [sz+16, sz+16], iconAnchor: [(sz+16)/2, (sz+16)/2], popupAnchor: [0, -(sz/2+8)] });
+}
+
+// ── Map sub-components (unchanged) ─────────────────────────────────────────
+
 function SetInitialView() {
   const map = useMap();
-  useEffect(() => {
-    map.setView([38.5, -95] as [number, number], 4);
-  }, []);
+  useEffect(() => { map.setView([39.5, -96], 4); }, []);
   return null;
 }
 
-// ── Map fly-to helper ──────────────────────────────────────────────────────
-function FlyTo({ tower }: { tower: Tower | null }) {
+function FlyTo({ state }: { state: StateData | null }) {
   const map = useMap();
-  useEffect(() => {
-    if (tower) {
-      map.flyTo([tower.lat, tower.lng] as [number, number], 7, { duration: 0.9 });
-    }
-  }, [tower, map]);
+  useEffect(() => { if (state) map.flyTo([state.lat, state.lng], 7, { duration: 0.9 }); }, [state, map]);
   return null;
 }
 
-// ── Detail Panel ───────────────────────────────────────────────────────────
-function DetailPanel({ tower }: { tower: Tower | null }) {
-  if (!tower) {
-    return (
-      <div style={styles.panel}>
-        <div style={styles.panelHeader}>
-          <p style={{ ...styles.panelTitle, color: "#8a9ab5", fontWeight: 400 }}>
-            No location selected
-          </p>
-        </div>
-        <div style={styles.emptyState}>
-          <svg width={40} height={40} viewBox="0 0 24 24" fill="none"
-            stroke="#8a9ab5" strokeWidth={1.2} opacity={0.4}>
-            <path d="M12 2L8 12H2l4.5 3.5L5 22l7-4 7 4-1.5-6.5L22 12h-6L12 2z"/>
-          </svg>
-          <p style={styles.emptyText}>
-            Click any pin on the map to explore tower project details and work breakdown.
-          </p>
-        </div>
-      </div>
-    );
-  }
+// ── Static summary data ─────────────────────────────────────────────────────
 
-  const ongoing = tower.status === "ongoing";
+const SUMMARY_PIE = [
+  { name: "Passing SA",      value: 125, color: "#3B82F6" },
+  { name: "Full SA",      value: 97, color: "#d80e1896" },
+  { name: "Passing SA Reviews",      value: 158, color: "#fa7305" },
+  { name: "Mod SA",      value: 28, color: "#e2cd0a" },
+  { name: "Failing SA",      value: 16, color: "#850541" },
+  { name: "Mod Drawing",         value: 28,  color: "#EF4444" },
+  { name: "Re-runs",             value: 19,   color: "#06B6D4" },
+  { name: "Prelim Design",       value: 19,   color: "#84CC16" },
+  { name: "Closeout Reports",    value: 15,   color: "#6366F1" },
+  { name: "Inspection Reports",  value: 17,   color: "#0e574e" },
+  { name: "Guyed Tower Reviews", value: 3,   color: "#EC4899" },
+  { name: "Mount Analysis",      value: 10, color: "#F97316" },
+  { name: "Fatigue Analysis",      value: 7, color: "#8d1919" },
+  { name: "Corrosion Analysis",      value: 8, color: "#229722" },
+  { name: "CFD Analysis",      value: 6, color: "#8bf006" },
+  { name: "FEA Analysis",      value: 7, color: "#552f4dc9" },
+  { name: "Heat Study",      value: 8, color: "#10c4db" },
+  
+];
 
+const TOTAL_SUMMARY = SUMMARY_PIE.reduce((a, d) => a + d.value, 0);
+
+const renderCustomLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent }: any) => {
+  if (percent < 0.04) return null;
+  const RADIAN = Math.PI / 180;
+  const radius = innerRadius + (outerRadius - innerRadius) * 0.55;
+  const x = cx + radius * Math.cos(-midAngle * RADIAN);
+  const y = cy + radius * Math.sin(-midAngle * RADIAN);
   return (
-    <div style={styles.panel}>
-      {/* Header */}
-      <div style={styles.panelHeader}>
-        <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 8 }}>
-          <div>
-            <p style={styles.panelTitle}>{tower.state}</p>
-            <p style={styles.panelSub}>{tower.name} · {tower.location}</p>
-          </div>
-          <span style={{
-            ...styles.badge,
-            background: ongoing ? "#FAEEDA" : "#EAF3DE",
-            color: ongoing ? "#854F0B" : "#3B6D11",
-          }}>
-            {ongoing ? "Ongoing" : "Completed"}
-          </span>
-        </div>
+    <text x={x} y={y} fill="#fff" textAnchor="middle" dominantBaseline="central"
+      style={{ fontSize: 10, fontWeight: 800, textShadow: "0 1px 3px rgba(0,0,0,0.5)" }}>
+      {`${Math.round(percent * 100)}%`}
+    </text>
+  );
+};
+
+// ── DetailPanel — permanently static, never reads `selected` ────────────────
+
+function DetailPanel() {
+  return (
+    <div style={S.panel}>
+      <div style={S.panelHeader}>
+        <p style={S.panelTitle}>Portfolio Overview</p>
+        <p style={S.panelSub}>500+ deliverables · 26 states · 15+ months</p>
       </div>
 
-      {/* Donut chart */}
-      <div style={{ padding: "14px 16px 0", display: "flex", justifyContent: "center" }}>
-        <PieChart width={160} height={160}>
+      <div style={{ display: "flex", justifyContent: "center", padding: "14px 8px 4px" }}>
+        <PieChart width={210} height={210}>
           <Pie
-            data={tower.work}
-            dataKey="pct"
-            nameKey="label"
-            cx={80} cy={80}
-            innerRadius={46}
-            outerRadius={72}
-            stroke="#fff"
-            strokeWidth={3}
-            animationBegin={0}
-            animationDuration={450}
+            data={SUMMARY_PIE}
+            dataKey="value"
+            nameKey="name"
+            cx={105} cy={105}
+            innerRadius={55} outerRadius={95}
+            animationBegin={0} animationDuration={600}
+            isAnimationActive={true}
+            labelLine={false}
+            label={renderCustomLabel}
           >
-            {tower.work.map((w, i) => <Cell key={i} fill={w.color} />)}
+            {SUMMARY_PIE.map((d, i) => (
+              <Cell key={`cell-${i}`} fill={d.color} stroke="#0d1b3e" strokeWidth={2} />
+            ))}
           </Pie>
           <Tooltip
-            formatter={(v: number, name: string) => [`${v}%`, name]}
+            formatter={(v: number, n: string) => [
+              `${v}+ (${Math.round(v / TOTAL_SUMMARY * 100)}%)`, n
+            ]}
             contentStyle={{
-              fontSize: 12,
-              borderRadius: 8,
-              border: "1px solid rgba(0,0,0,0.1)",
-              boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+              fontSize: 11, borderRadius: 8,
+              border: "1px solid rgba(255,255,255,0.1)",
+              background: "#1a2d5a", color: "#e0e8f8",
             }}
           />
         </PieChart>
       </div>
 
-      {/* Legend */}
-      <div style={{ padding: "4px 16px 12px", display: "flex", flexDirection: "column", gap: 5 }}>
-        {tower.work.map((w, i) => (
-          <div key={i} style={styles.legendRow}>
-            <span style={{ ...styles.legendSwatch, background: w.color }} />
-            <span style={styles.legendLabel}>{w.label}</span>
-            <span style={styles.legendPct}>{w.pct}%</span>
+      <div style={{ padding: "0 14px 10px", overflowY: "auto", flex: 1 }}>
+        <p style={S.sectionLabel}>Service Totals</p>
+        {SUMMARY_PIE.map((d, i) => (
+          <div key={i} style={S.row}>
+            <span style={{ ...S.swatch, background: d.color }} />
+            <span style={S.rowLabel}>{d.name}</span>
+            <span style={{
+              ...S.rowCount,
+              background: `${d.color}22`, color: d.color,
+              borderRadius: 6, padding: "1px 7px", fontWeight: 800,
+            }}>
+              {Math.round(d.value / TOTAL_SUMMARY * 100)}%
+            </span>
           </div>
         ))}
       </div>
 
-      {/* Metrics */}
-      <div style={styles.metricsGrid}>
-        {[
-          { label: "Height",    value: tower.height },
-          { label: "Year",      value: String(tower.year) },
-          { label: "Team size", value: `${tower.team} eng.` },
-          { label: "Duration",  value: tower.duration },
-        ].map((m) => (
-          <div key={m.label} style={styles.metricCard}>
-            <p style={styles.metricLabel}>{m.label}</p>
-            <p style={styles.metricValue}>{m.value}</p>
+      <div style={S.statsRow}>
+        {[{ l: "States", v: "26" }, { l: "Months", v: "15+" }, { l: "Total", v: "500+" }].map(m => (
+          <div key={m.l} style={S.statCard}>
+            <p style={S.statVal}>{m.v}</p>
+            <p style={S.statLbl}>{m.l}</p>
           </div>
         ))}
       </div>
@@ -486,336 +251,148 @@ function DetailPanel({ tower }: { tower: Tower | null }) {
   );
 }
 
-// ── Main Component ─────────────────────────────────────────────────────────
-export default function TowerMap() {
-  const [selected, setSelected] = useState<Tower | null>(null);
+// ── Root component ──────────────────────────────────────────────────────────
 
-  // Inject pulse keyframes once
+export default function TowerMap() {
+  // `selected` drives ONLY marker highlight + FlyTo — never touches DetailPanel
+  const [selected, setSelected] = useState<StateData | null>(null);
+
   useEffect(() => {
-    const id = "tower-pulse-style";
+    const id = "atss-styles";
     if (!document.getElementById(id)) {
-      const style = document.createElement("style");
-      style.id = id;
-      style.textContent = `
-        @keyframes towerPulse {
-          0%   { opacity: 0.7; transform: scale(1); }
-          70%  { opacity: 0;   transform: scale(2.2); }
-          100% { opacity: 0;   transform: scale(2.2); }
-        }
+      const el = document.createElement("style");
+      el.id = id;
+      el.textContent = `
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;800;900&family=Poppins:wght@300;400;500;600;700&display=swap');
+        @keyframes towerPulse { 0%{opacity:.6;transform:scale(1)} 70%{opacity:0;transform:scale(2.4)} 100%{opacity:0;transform:scale(2.4)} }
+        @keyframes shimmer { 0%{background-position:200% center} 100%{background-position:-200% center} }
+        @keyframes fadeSlideDown { from{opacity:0;transform:translateY(-14px)} to{opacity:1;transform:translateY(0)} }
+        @keyframes glowPulse { 0%,100%{opacity:0.5} 50%{opacity:1} }
+        .leaflet-control-attribution { display: none !important; }
+        .leaflet-control-zoom { border-radius: 8px !important; overflow: hidden; border: 1px solid rgba(255,255,255,0.12) !important; background: #0d1b3e !important; }
+        .leaflet-control-zoom a { color: #e0e8f8 !important; background: #0d1b3e !important; font-family: 'Poppins', sans-serif !important; }
+        .leaflet-control-zoom a:hover { background: #1a2d5a !important; }
+        .atss-heading { animation: fadeSlideDown 0.8s cubic-bezier(0.22,1,0.36,1) both; }
       `;
-      document.head.appendChild(style);
+      document.head.appendChild(el);
     }
   }, []);
 
   return (
-    <div style={styles.page}>
-      {/* Page header */}
-      <div style={styles.pageHeader}>
-        <span style={styles.headerBadge}>Project Map</span>
-        <h1 style={styles.h1}>ATSS Tower Infrastructure</h1>
-        <p style={styles.subtitle}>
-          Click any marker to explore project details. Map powered by OpenStreetMap.
-        </p>
+    <div style={S.page}>
+      {/* ── Decorative Header ── */}
+      <div style={S.headerWrap} className="atss-heading">
+        <div style={S.ruleRow}>
+          <div style={S.ruleLine} />
+          <div style={S.ruleDiamond} />
+          <div style={S.ruleLine} />
+        </div>
+
+        <div style={S.headerCenter}>
+          <span style={S.eyebrow}>ATSS · Active Project Portfolio</span>
+          <h1 style={S.h1}>Interactive Coverage Map</h1>
+          <h2 style={S.h2}>of Active Tower Structural Engineering Projects</h2>
+          <p style={S.tagline}>
+            Showcasing ATSS's expanding infrastructure footprint through detailed analyses,
+            modification drawings, and engineering deliverables.
+          </p>
+          <div style={S.statStrip}>
+            {[
+              { v: "500+", l: "Deliverables" },
+              { v: "26",   l: "States" },
+              { v: "20+",  l: "Months Active" },
+              { v: "10+",  l: "Service Types" },
+            ].map(m => (
+              <div key={m.l} style={S.statPill}>
+                <span style={S.statPillVal}>{m.v}</span>
+                <span style={S.statPillLbl}>{m.l}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div style={S.ruleRow}>
+          <div style={S.ruleLine} />
+          <span style={S.ruleText}>CLICK ANY MARKER TO EXPLORE</span>
+          <div style={S.ruleLine} />
+        </div>
       </div>
 
-      {/* App shell */}
-      <div style={styles.shell}>
-        {/* Map */}
-        <div style={styles.mapWrap}>
-          <MapContainer
-            style={{ width: "100%", height: "100%" }}
-          >
+      <div style={S.shell}>
+        <div style={S.mapWrap}>
+          <MapContainer style={{ width: "100%", height: "100%" }}>
             <SetInitialView />
-            {/* CARTO Voyager tiles — built on OpenStreetMap, no API key needed */}
-            <TileLayer
-              {...({
-                url: "https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png",
-                attribution: "&copy; OpenStreetMap contributors &copy; CARTO",
-                subdomains: ["a", "b", "c", "d"],
-                maxZoom: 19,
-              } as any)}
-            />
-
-            <FlyTo tower={selected} />
-
-            {towers.map((tower) => (
+            <TileLayer {...({
+              url: "https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png",
+              attribution: "",
+              subdomains: ["a","b","c","d"],
+              maxZoom: 19,
+            } as any)} />
+            <FlyTo state={selected} />
+            {stateData.map(s => (
               <Marker
-                key={tower.id}
-                position={[tower.lat, tower.lng] as [number, number]}
-                eventHandlers={{
-                  click: () => setSelected(tower),
-                }}
-                {...({ icon: makeIcon(tower, selected?.id === tower.id) } as any)}
+                key={s.id}
+                position={[s.lat, s.lng] as [number, number]}
+                eventHandlers={{ click: () => setSelected(s) }}
+                {...({ icon: makeIcon(s, selected?.id === s.id) } as any)}
               >
                 <Popup>
-                  <div style={{
-                    fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
-                    fontSize: 13,
-                    lineHeight: 1.5,
-                    minWidth: 160,
-                  }}>
-                    <strong style={{ fontSize: 14 }}>{tower.name}</strong>
-                    <br />
-                    <span style={{ color: "#5a6a8a" }}>{tower.location}</span>
-                    <br />
-                    <span style={{
-                      display: "inline-block",
-                      marginTop: 5,
-                      fontSize: 11,
-                      fontWeight: 600,
-                      padding: "2px 8px",
-                      borderRadius: 999,
-                      background: tower.status === "ongoing" ? "#FAEEDA" : "#EAF3DE",
-                      color: tower.status === "ongoing" ? "#854F0B" : "#3B6D11",
-                    }}>
-                      {tower.status === "ongoing" ? "Ongoing" : "Completed"}
-                    </span>
-                    <br />
-                    <button
-                      onClick={() => setSelected(tower)}
-                      style={{
-                        marginTop: 8,
-                        padding: "4px 10px",
-                        fontSize: 12,
-                        borderRadius: 6,
-                        border: "1px solid #185FA5",
-                        background: "#185FA5",
-                        color: "#fff",
-                        cursor: "pointer",
-                      }}
-                    >
-                      View details →
-                    </button>
+                  <div style={{ fontFamily: "'Poppins', system-ui, sans-serif", fontSize: 13, lineHeight: 1.5, minWidth: 140 }}>
+                    <strong style={{ fontSize: 14, color: "#0a1640", fontFamily: "'Playfair Display', Georgia, serif" }}>{s.state}</strong><br />
+                    <span style={{ color: "#5a6a8a" }}>{s.total}+ deliverables</span><br />
+                    <span style={{ fontSize: 11, color: "#8a9ab5" }}>{s.services.length} service categories</span>
                   </div>
                 </Popup>
               </Marker>
             ))}
           </MapContainer>
-
-          {/* Map legend overlay */}
-          <div style={styles.mapLegend}>
-            {[
-              { label: "Completed", color: "#185FA5" },
-              { label: "Ongoing",   color: "#BA7517" },
-            ].map(({ label, color }) => (
-              <div key={label} style={styles.legendRowMap}>
-                <div style={{ ...styles.legendDot, background: color }} />
-                <span style={{ fontSize: 11, color: "#0a1640" }}>{label}</span>
-              </div>
-            ))}
-          </div>
-
-          {/* Tower count badge */}
-          <div style={styles.countBadge}>
-            <span style={{ fontWeight: 700, fontSize: 14, color: "#0a1640" }}>
-              {towers.length}
-            </span>
-            <span style={{ fontSize: 11, color: "#5a6a8a", marginLeft: 4 }}>towers</span>
-          </div>
         </div>
 
-        {/* Detail panel */}
-        <DetailPanel tower={selected} />
+        {/* DetailPanel receives no props — it is fully static */}
+        <DetailPanel />
       </div>
     </div>
   );
 }
 
-// ── Styles ─────────────────────────────────────────────────────────────────
-const styles: Record<string, React.CSSProperties> = {
+// ── Styles (unchanged) ──────────────────────────────────────────────────────
+
+const S: Record<string, React.CSSProperties> = {
   page: {
-    fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
-    background: "#f0f4f8",
+    fontFamily: "'Poppins', system-ui, sans-serif",
+    background: "#080f22",
     minHeight: "100vh",
     display: "flex",
     flexDirection: "column",
-    alignItems: "center",
-    padding: "32px 16px",
+    padding: "20px 16px 14px",
   },
-  pageHeader: {
-    width: "100%",
-    maxWidth: 1140,
-    marginBottom: 20,
-  },
-  headerBadge: {
-    display: "inline-block",
-    background: "linear-gradient(135deg, #b8962e, #f0d060)",
-    color: "#0a1640",
-    fontSize: 11,
-    fontWeight: 700,
-    letterSpacing: "0.1em",
-    textTransform: "uppercase",
-    padding: "3px 12px",
-    borderRadius: 999,
-    marginBottom: 8,
-  },
-  h1: {
-    fontSize: 26,
-    fontWeight: 700,
-    color: "#0a1640",
-    letterSpacing: "-0.02em",
-    margin: 0,
-  },
-  subtitle: {
-    fontSize: 14,
-    color: "#5a6a8a",
-    marginTop: 4,
-  },
-  shell: {
-    display: "flex",
-    width: "100%",
-    maxWidth: 1140,
-    height: 560,
-    borderRadius: 16,
-    overflow: "hidden",
-    border: "1px solid rgba(10,22,64,0.12)",
-    boxShadow: "0 8px 40px rgba(10,22,64,0.12)",
-    background: "#fff",
-  },
-  mapWrap: {
-    flex: "1 1 0",
-    position: "relative",
-    minWidth: 0,
-  },
-  mapLegend: {
-    position: "absolute",
-    bottom: 24,
-    left: 12,
-    zIndex: 1000,
-    background: "rgba(255,255,255,0.95)",
-    borderRadius: 8,
-    border: "1px solid rgba(10,22,64,0.1)",
-    padding: "8px 12px",
-    display: "flex",
-    flexDirection: "column",
-    gap: 5,
-    backdropFilter: "blur(4px)",
-    pointerEvents: "none",
-  },
-  legendRowMap: {
-    display: "flex",
-    alignItems: "center",
-    gap: 6,
-  },
-  legendDot: {
-    width: 10,
-    height: 10,
-    borderRadius: "50%",
-    border: "2px solid #fff",
-    boxShadow: "0 1px 3px rgba(0,0,0,0.2)",
-  },
-  countBadge: {
-    position: "absolute",
-    top: 12,
-    left: 12,
-    zIndex: 1000,
-    background: "rgba(255,255,255,0.95)",
-    borderRadius: 8,
-    border: "1px solid rgba(10,22,64,0.1)",
-    padding: "6px 12px",
-    backdropFilter: "blur(4px)",
-    display: "flex",
-    alignItems: "baseline",
-    pointerEvents: "none",
-  },
-  panel: {
-    flex: "0 0 270px",
-    display: "flex",
-    flexDirection: "column",
-    borderLeft: "1px solid rgba(10,22,64,0.1)",
-    background: "#fff",
-    overflow: "hidden",
-  },
-  panelHeader: {
-    padding: "16px 16px 12px",
-    borderBottom: "1px solid rgba(10,22,64,0.08)",
-    flexShrink: 0,
-  },
-  panelTitle: {
-    fontSize: 16,
-    fontWeight: 700,
-    color: "#0a1640",
-    lineHeight: 1.3,
-    margin: 0,
-  },
-  panelSub: {
-    fontSize: 11,
-    color: "#5a6a8a",
-    marginTop: 3,
-    marginBottom: 0,
-  },
-  badge: {
-    display: "inline-block",
-    fontSize: 10,
-    fontWeight: 600,
-    padding: "2px 9px",
-    borderRadius: 999,
-    flexShrink: 0,
-    whiteSpace: "nowrap",
-    marginTop: 2,
-  },
-  emptyState: {
-    flex: 1,
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 12,
-    padding: 24,
-    textAlign: "center",
-  },
-  emptyText: {
-    fontSize: 13,
-    lineHeight: 1.6,
-    color: "#8a9ab5",
-    maxWidth: 200,
-    margin: 0,
-  },
-  legendRow: {
-    display: "flex",
-    alignItems: "center",
-    gap: 7,
-    fontSize: 12,
-    color: "#5a6a8a",
-  },
-  legendSwatch: {
-    width: 8,
-    height: 8,
-    borderRadius: 2,
-    flexShrink: 0,
-  },
-  legendLabel: {
-    flex: 1,
-  },
-  legendPct: {
-    fontWeight: 600,
-    fontSize: 12,
-    color: "#0a1640",
-    minWidth: 28,
-    textAlign: "right",
-  },
-  metricsGrid: {
-    display: "grid",
-    gridTemplateColumns: "1fr 1fr",
-    gap: 7,
-    padding: "4px 16px 16px",
-  },
-  metricCard: {
-    background: "#f4f6fa",
-    borderRadius: 8,
-    padding: "8px 10px",
-    border: "1px solid rgba(10,22,64,0.06)",
-  },
-  metricLabel: {
-    fontSize: 10,
-    color: "#5a6a8a",
-    margin: 0,
-  },
-  metricValue: {
-    fontSize: 14,
-    fontWeight: 700,
-    color: "#0a1640",
-    marginTop: 2,
-    marginBottom: 0,
-  },
+  headerWrap: { width: "100%", marginBottom: 14 },
+  ruleRow: { display: "flex", alignItems: "center", gap: 10, marginBottom: 10 },
+  ruleLine: { flex: 1, height: 1, background: "linear-gradient(90deg, transparent, rgba(232,200,74,0.4), transparent)" },
+  ruleDiamond: { width: 7, height: 7, background: "#e8c84a", transform: "rotate(45deg)", flexShrink: 0 },
+  ruleText: { fontSize: 9, fontWeight: 700, letterSpacing: "0.18em", color: "rgba(232,200,74,0.5)", flexShrink: 0, whiteSpace: "nowrap" as const, fontFamily: "'Playfair Display', Georgia, serif" },
+  headerCenter: { display: "flex", flexDirection: "column" as const, alignItems: "center", textAlign: "center" as const, marginBottom: 14, padding: "0 16px" },
+  eyebrow: { display: "block", fontSize: 10, fontWeight: 600, letterSpacing: "0.22em", textTransform: "uppercase" as const, color: "#e8c84a", marginBottom: 10, fontFamily: "'Playfair Display', Georgia, serif" },
+  h1: { fontFamily: "'Playfair Display', Georgia, serif", fontSize: 38, fontWeight: 800, color: "#e0e8f8", letterSpacing: "0.04em", lineHeight: 1.1, margin: "0 0 4px", textTransform: "uppercase" as const, background: "linear-gradient(90deg, #b8962e, #f0d060, #e8c84a, #b8962e)", backgroundSize: "200% auto", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", animation: "shimmer 4s linear infinite" },
+  h2: { fontFamily: "'Poppins', sans-serif", fontSize: 16, fontWeight: 300, color: "#8aabcc", letterSpacing: "0.12em", textTransform: "uppercase" as const, margin: "0 0 12px" },
+  tagline: { fontSize: 13, fontFamily: "'Poppins', sans-serif", fontWeight: 400, color: "#5a7a9a", maxWidth: 560, lineHeight: 1.6, margin: "0 0 16px", letterSpacing: "0.02em" },
+  statStrip: { display: "flex", gap: 8, flexWrap: "wrap" as const, justifyContent: "center" },
+  statPill: { display: "flex", flexDirection: "column" as const, alignItems: "center", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(232,200,74,0.15)", borderRadius: 10, padding: "6px 16px", minWidth: 64 },
+  statPillVal: { fontSize: 18, fontWeight: 700, color: "#e0e8f8", lineHeight: 1.1, fontFamily: "'Playfair Display', Georgia, serif" },
+  statPillLbl: { fontSize: 9, color: "#4a6a8a", textTransform: "uppercase" as const, letterSpacing: "0.1em", marginTop: 2, fontFamily: "'Poppins', sans-serif", fontWeight: 600 },
+  shell: { display: "flex", width: "100%", flex: 1, minHeight: 620, borderRadius: 14, overflow: "hidden", border: "1px solid rgba(255,255,255,0.08)", boxShadow: "0 8px 40px rgba(0,0,0,0.5)", background: "#0d1b3e" },
+  mapWrap: { flex: "1 1 0", position: "relative", minWidth: 0 },
+  panel: { flex: "0 0 245px", display: "flex", flexDirection: "column", borderLeft: "1px solid rgba(255,255,255,0.08)", background: "#0d1b3e", overflow: "hidden" },
+  panelHeader: { padding: "14px 16px 10px", borderBottom: "1px solid rgba(255,255,255,0.07)", flexShrink: 0 },
+  panelTitle: { fontSize: 15, fontWeight: 700, color: "#e0e8f8", margin: 0, lineHeight: 1.3, fontFamily: "'Playfair Display', Georgia, serif" },
+  panelSub: { fontSize: 11, color: "#6a8aaa", marginTop: 3, marginBottom: 0, fontFamily: "'Poppins', sans-serif" },
+  sectionLabel: { fontSize: 10, fontWeight: 700, color: "#4a6a8a", textTransform: "uppercase" as const, letterSpacing: "0.1em", margin: "6px 0 5px", fontFamily: "'Playfair Display', Georgia, serif" },
+  row: { display: "flex", alignItems: "center", gap: 7, paddingBottom: 5, borderBottom: "1px solid rgba(255,255,255,0.04)", marginBottom: 4 },
+  swatch: { width: 8, height: 8, borderRadius: 2, flexShrink: 0 },
+  rowLabel: { flex: 1, fontSize: 11, color: "#7a9abb", fontFamily: "'Poppins', sans-serif", fontWeight: 600 },
+  rowCount: { fontWeight: 700, fontSize: 12, color: "#e0e8f8", minWidth: 20, textAlign: "right" as const, fontFamily: "'Playfair Display', Georgia, serif" },
+  statsRow: { display: "flex", borderTop: "1px solid rgba(255,255,255,0.07)", flexShrink: 0 },
+  statCard: { flex: 1, padding: "10px 8px", textAlign: "center" as const, borderRight: "1px solid rgba(255,255,255,0.05)" },
+  statVal: { fontSize: 16, fontWeight: 700, color: "#e0e8f8", margin: 0, fontFamily: "'Playfair Display', Georgia, serif" },
+  statLbl: { fontSize: 10, color: "#4a6a8a", margin: "2px 0 0", fontFamily: "'Poppins', sans-serif", fontWeight: 600 },
 };

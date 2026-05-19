@@ -1,16 +1,96 @@
-import { motion, useScroll, useTransform } from "framer-motion";
+import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion";
 import { Menu, X } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 
 const links = [
   { label: "Home", href: "/" },
   { label: "About Us", href: "/about" },
   { label: "Services", href: "/services" },
-  { label: "Our Work", href: "/work" },
+  //{ label: "Our Work", href: "/work" },
   { label: "Blog", href: "/blog" },
   { label: "Contact", href: "/contact" },
 ];
+
+const TAGLINE = "Engineering Simplified";
+
+function TypingTagline() {
+  const [visibleCount, setVisibleCount] = useState(0);
+  const [isErasing, setIsErasing] = useState(false);
+
+  useEffect(() => {
+    let timeout: ReturnType<typeof setTimeout>;
+
+    if (!isErasing) {
+      if (visibleCount < TAGLINE.length) {
+        // Type next character
+        timeout = setTimeout(() => setVisibleCount((c) => c + 1), 90);
+      } else {
+        // Fully typed — pause, then start erasing
+        timeout = setTimeout(() => setIsErasing(true), 2200);
+      }
+    } else {
+      if (visibleCount > 0) {
+        // Erase one character at a time
+        timeout = setTimeout(() => setVisibleCount((c) => c - 1), 45);
+      } else {
+        // Fully erased — pause, then start typing again
+        setIsErasing(false);
+        timeout = setTimeout(() => setVisibleCount(1), 300);
+      }
+    }
+
+    return () => clearTimeout(timeout);
+  }, [visibleCount, isErasing]);
+
+  return (
+    <p
+      className="mt-0.5 flex items-center gap-0"
+      style={{
+        fontFamily: "'poppins', sans-serif",
+        fontStyle: "italic",
+        fontWeight: 500,
+        fontSize: "1.0rem",
+        letterSpacing: "0.2em",
+        textTransform: "uppercase",
+        color: "#3b7ecf",
+        minWidth: "max-content",
+      }}
+    >
+      {TAGLINE.split("").map((char, i) => (
+        <motion.span
+          key={i}
+          animate={{
+            opacity: i < visibleCount ? 1 : 0,
+            y: i < visibleCount ? 0 : 4,
+            filter: i < visibleCount ? "blur(0px)" : "blur(2px)",
+          }}
+          transition={{
+            duration: 0.18,
+            ease: [0.25, 0.46, 0.45, 0.94],
+          }}
+          style={{ display: "inline-block" }}
+        >
+          {char === " " ? "\u00A0" : char}
+        </motion.span>
+      ))}
+
+      {/* Softly breathing cursor */}
+      <motion.span
+        animate={{ opacity: [1, 0.15] }}
+        transition={{
+          duration: 0.8,
+          repeat: Infinity,
+          repeatType: "reverse",
+          ease: "easeInOut",
+        }}
+        style={{ marginLeft: 2, color: "#3b7ecf", fontStyle: "normal" }}
+      >
+        |
+      </motion.span>
+    </p>
+  );
+}
 
 const Navbar = () => {
   const [open, setOpen] = useState(false);
@@ -29,13 +109,22 @@ const Navbar = () => {
         <Link to="/" className="group flex items-center gap-2.5">
           <img src="/ats2-logo.png" alt="ATS² Logo" className="h-12 md:h-16 object-contain" />
           <div className="hidden md:flex flex-col">
-           <h1 className="text-lg md:text-2xl font-extrabold tracking-tight leading-none bg-gradient-to-r from-blue-950 via-blue-800 to-blue-600 bg-clip-text text-transparent drop-shadow-sm">
-  Advanced Tower Structural Solutions
-</h1>
-
-<p className="mt-1 text-sm md:text-base font-semibold tracking-wide uppercase text-blue-700">
-  Engineering Simplified
-</p>
+            <h1
+              style={{
+                fontFamily: "'Playfair Display', serif",
+                fontWeight: 900,
+                fontSize: "1.35rem",
+                lineHeight: 1.1,
+                background: "linear-gradient(90deg, #0a1f44 0%, #1a4a9e 50%, #3b7ecf 100%)",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+                backgroundClip: "text",
+                letterSpacing: "-0.01em",
+              }}
+            >
+              Advanced Tower Structural Solutions
+            </h1>
+            <TypingTagline />
           </div>
         </Link>
 

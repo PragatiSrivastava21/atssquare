@@ -8,7 +8,7 @@ import Work from "@/components/site/Work";
 import Trust from "@/components/site/Trust";
 import CTA from "@/components/site/CTA";
 import Footer from "@/components/site/Footer";
-
+import PMI from "@/components/site/pmi"
 const Index = () => {
   useLenis();
 
@@ -17,9 +17,10 @@ const Index = () => {
       <Navbar />
       <Hero />
       <StatsCounter />
-      <ProblemSolution />
+  
+        <ProblemSolution />
       <Process />
-      
+      <PMI />
       <Trust />
       <CTA />
       <Footer />

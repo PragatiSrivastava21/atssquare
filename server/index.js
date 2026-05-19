@@ -15,7 +15,7 @@ app.post("/api/send-email", async (req, res) => {
   }
 
   const apiKey = process.env.RESEND_API_KEY;
-  const to = process.env.RESEND_TO_EMAIL || "pragatisri21@gmail.com";
+  const to = process.env.RESEND_TO_EMAIL || "tomorrowtech.engineering@gmail.com";
   const from = process.env.RESEND_FROM_EMAIL || "onboarding@resend.dev";
 
   if (!apiKey) {

@@ -11,62 +11,56 @@ const OurWork = () => {
   return (
     <main className="relative min-h-screen overflow-x-hidden bg-background text-foreground">
       <Navbar />
-    <section  className="relative min-h-screen flex items-center overflow-hidden">
-        <motion.div className="absolute inset-0">
-          <img
-            src={ourworkbg}
-            alt="Telecom tower infrastructure at golden hour"
-            width={1920}
-            height={1080}
-            className="h-full w-full object-cover scale-110 opacity-80"
-          />
-        </motion.div>
-        <div className="absolute inset-0 bg-gradient-to-b from-[hsl(217,67%,7%)/0.7] via-[hsl(217,67%,12%)/0.6] to-background" />
-        <div className="absolute inset-0 bg-gradient-to-r from-[hsl(217,67%,7%)/0.5] via-transparent to-transparent" />
+   <section className="relative min-h-screen flex items-center overflow-hidden">
+  <motion.div className="absolute inset-0">
+    <img
+      src={ourworkbg}
+      alt="Telecom tower infrastructure at golden hour"
+      width={1920}
+      height={1080}
+      className="h-full w-full object-cover scale-110 opacity-70"
+    />
+  </motion.div>
+  <div className="absolute inset-0 bg-gradient-to-b from-[hsl(217,67%,7%)/0.7] via-[hsl(217,67%,12%)/0.6] to-background" />
+  <div className="absolute inset-0 bg-gradient-to-r from-[hsl(217,67%,7%)/0.5] via-transparent to-transparent" />
 
-        <div className="container-px relative z-10 mx-auto pt-5 pb-20">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7 }}
-            className="max-w-3xl"
-          >
-            <span className="inline-block rounded-full bg-white px-3 py-1 text-xs font-medium text-primary">
-              Our Work
-            </span>
-            <h1 className="mt-5 font-display text-4xl font-semibold text-[#091a3d] md:text-6xl">
-              <span className="whitespace-nowrap">Real towers.{" "}</span><br />
-              <span className="relative inline-block">
-                <span className="text-yellow-500">Real</span>
-                <svg className="absolute -bottom-2 left-0 w-full" viewBox="0 0 200 12" fill="none">
-                  <path d="M2 9 Q 50 2, 100 6 T 198 4" stroke="hsl(44, 65%, 52%)" strokeWidth="2.5" strokeLinecap="round" />
-                </svg>
-              </span>{" "}
-              <span className="text-[#091a3d] decoration-[#d4a017] decoration-2">
-               outcomes.
-              </span>
-            </h1>
-            <p className="mt-6 text-lg text-black leading-relaxed max-w-2xl">
-             A selection of recent engagements with Tier-1 carriers and tower operators worldwide.
-            </p>
-          </motion.div>
-        </div>
+  <div className="container-px relative z-10 pt-5 pb-20">
+    <motion.div
+      initial={{ opacity: 0, y: 30 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.7 }}
+      className="max-w-3xl text-left ml-0 mr-auto"  
+    >
+      <span className="inline-block rounded-full bg-white px-3 py-1 text-xs font-medium text-primary">
+        Our Work
+      </span>
+      <h1 className="mt-5 font-display text-4xl font-semibold text-[#091a3d] md:text-6xl">
+        <span className="whitespace-nowrap">Real towers.{" "}</span><br />
+        <span className="relative inline-block">
+          <span className="text-yellow-500">Real</span>
+          <svg className="absolute -bottom-2 left-0 w-full" viewBox="0 0 200 12" fill="none">
+            <path d="M2 9 Q 50 2, 100 6 T 198 4" stroke="hsl(44, 65%, 52%)" strokeWidth="2.5" strokeLinecap="round" />
+          </svg>
+        </span>{" "}
+        <span className="text-[#091a3d] decoration-[#d4a017] decoration-2">
+          outcomes.
+        </span>
+      </h1>
+      <p className="mt-6 text-lg text-black leading-relaxed max-w-2xl">
+        A curated selection of recent engineering engagements delivered in collaboration with leading Tier-1 carriers and major tower infrastructure operators, highlighting ATSS's expertise in structural analysis, modification design, and precision engineering support across complex telecommunications infrastructure projects.
+      </p>
+    </motion.div>
+  </div>
 
-         <div
-    className="absolute bottom-0 left-0 w-full h-32 bg-gradient-to-r from-slate-900 via-blue-700 to-blue-500"
-    style={{
-      clipPath: "polygon(0 40%, 25% 70%, 55% 45%, 75% 55%, 100% 40%, 100% 100%, 0% 100%)",
-    }}
-  />
-
-  {/* White section below */}
   <div
-    className="absolute bottom-0 left-0 w-full h-28 bg-white "
-    style={{
-      clipPath: "polygon(0 60%, 25% 80%, 55% 55%, 75% 65%, 100% 50%, 100% 100%, 0% 100%)",
-    }}
+    className="absolute bottom-0 left-0 w-full h-32 bg-gradient-to-r from-slate-900 via-blue-700 to-blue-500"
+    style={{ clipPath: "polygon(0 40%, 25% 70%, 55% 45%, 75% 55%, 100% 40%, 100% 100%, 0% 100%)" }}
   />
-      </section>
+  <div
+    className="absolute bottom-0 left-0 w-full h-28 bg-white"
+    style={{ clipPath: "polygon(0 60%, 25% 80%, 55% 55%, 75% 65%, 100% 50%, 100% 100%, 0% 100%)" }}
+  />
+</section>
       <Work />
       <CTA />
       <Footer />

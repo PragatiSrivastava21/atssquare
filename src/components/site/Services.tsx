@@ -2,22 +2,23 @@ import { motion } from "framer-motion";
 import { Activity, Building2, Antenna, Layers, Wind, Bot, ArrowUpRight } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import heroTower from "@/assets/hero-tower.jpg";
-import networkAerial from "@/assets/network-aerial.jpg";
+import heroTower from "@/assets/thermal.png";
+import networkAerial from "@/assets/self.jpg";
 import towerSlide1 from "@/assets/tower-slide-1.jpg";
-import towerSlide2 from "@/assets/tower-slide-2.jpg";
+import towerSlide2 from "@/assets/mm.png";
 import services1 from "@/assets/services-1.jpg";
-import services2 from "@/assets/services-2.png";
-import services3 from "@/assets/services-3.png";
-import services4 from "@/assets/services-4.png";
+import services2 from "@/assets/1.jpeg";
+import services3 from "@/assets/drawing.jpg";
+import services4 from "@/assets/foundation.jpeg";
 import services5 from "@/assets/services-5.png";
-import services6 from "@/assets/services-6.png";
+import services6 from "@/assets/fea.jpeg";
+import services7 from "@/assets/img.png";
 
 const services = [
   {
     icon: Activity,
     title: "Tower Structural Analysis",
-    desc: "TIA-222-H I compliant assessment of existing towers under current and future load profiles.",
+    desc: "TIA-222-H compliant assessment of existing towers under current and future load profiles.",
     details:
       "ATSS provides comprehensive tower structural analysis services to evaluate the overall stability, strength, and safety of telecom towers under existing and proposed loading conditions. Our analysis covers wind loads, seismic forces, equipment additions, and future expansion scenarios in accordance with applicable national and international standards. Using advanced analytical tools and AI-assisted validation, we identify overstressed members, assess reserve capacity, and recommend strengthening solutions to ensure long-term structural reliability and regulatory compliance.",
     code: "01",
@@ -26,7 +27,7 @@ const services = [
   {
     icon: Building2,
     title: "Structural Modification Design, Drawings & Construction Support",
-    desc: "Self-supporting, monopole and guyed designs engineered for terrain, climate and growth.",
+    desc: "Modification of self-support, guyed tower and monopole engineered according to carrier needs and new 5G load requirements.",
     details:
       "ATSS offers end-to-end structural modification, design, and construction support services for existing telecom infrastructure. This includes strengthening of towers and mounts, retrofitting for additional equipment, and design support for construction and erection activities. Our engineering teams work closely with field and construction teams to ensure safe implementation, constructability, and compliance with design intent. AI-assisted planning and documentation help streamline execution, reduce downtime, and improve overall project efficiency.",
     code: "02",
@@ -35,7 +36,7 @@ const services = [
   {
     icon: Antenna,
     title: "AI-Driven Mobile Application Services",
-    desc: "Mount capacity, modification design and reinforcement for 5G and mmWave equipment.",
+    desc: "ATSS provides a powerful AI-driven mobile application that digitally integrates field inspections, engineering analysis, and reporting.",
     details:
       "ATSS provides a powerful AI-driven mobile application that digitally integrates field inspections, engineering analysis, and reporting. The app supports tower and mount inspections through guided workflows, intelligent checklists, and AI-based image recognition for defect identification. Key features include auto generated COAX layouts based on site data, azimuths, and equipment configuration, real-time progress tracking, and automated data validation. Multi-language, one-click report generation ensures fast, standardized, and client-ready deliverables.",
     code: "03",
@@ -43,8 +44,8 @@ const services = [
   },
   {
     icon: Layers,
-    title: "New Tower & Mount Design",
-    desc: "Geotechnical-driven foundation review, retrofit and uplift / overturning assessment.",
+    title: "New Tower Design",
+    desc: "Geotechnical-driven foundation review, retrofit / overturning assessment.",
     details:
       "ATSS specializes in the design of new telecom towers and antenna mounting structures tailored to site-specific and client-specific requirements. Our designs emphasize structural efficiency, constructability, durability, and future upgrade flexibility. By combining intelligent design automation with engineering expertise, we deliver optimized solutions that reduce material usage, improve constructability, and support long-term network expansion.",
     code: "04",
@@ -52,12 +53,12 @@ const services = [
   },
   {
     icon: Wind,
-    title: "Antenna Mount Analysis",
-    desc: "",
+    title: "Mount Analysis and Design",
+    desc: "Antenna mount analysis services focus on verifying the structural adequacy and load-bearing performance of antenna mounts installed on towers, rooftops, poles, and other supporting structures",
     details:
       "Our antenna mount analysis services focus on verifying the structural adequacy and load-bearing performance of antenna mounts installed on towers, rooftops, poles, and other supporting structures. We assess mount alignment, connection integrity, and behavior under wind, eccentric, and combined loading conditions. AI-enabled engineering workflows allow faster evaluation of multiple mounting configurations while ensuring safety, precision, and optimal antenna performance.",
     code: "05",
-    image: services2,
+    image:  services7 ,
   },
   {
     icon: Bot,
@@ -83,17 +84,17 @@ const services = [
     desc: "Advanced structural simulation to validate stress, deflection and fatigue performance under load.",
     details:
       "ATSS offers advanced Finite Element Analysis (FEA) services to evaluate complex structural behavior that cannot be accurately captured using conventional methods. FEA is applied to critical components such as bolted and welded connections, base plates, gussets, brackets, and special structural elements. Through detailed stress, strain, deformation, and fatigue analysis, we help optimize designs, validate safety margins, and improve structural performance under real-world loading conditions.",
-    link: "/services/fea",
+  
     code: "08",
     image: services6,
   },
   {
     icon: Activity,
-    title: "Thermal and Heat Analysis",
+    title: "Thermal Analysis",
     desc: "Thermal mapping and heat transfer assessment for joints, coatings, and high-temperature load cases.",
     details:
       "Our thermal and heat analysis services assess the impact of temperature variations and heat generation on telecom structures and equipment. This includes evaluating thermal expansion effects, material performance in extreme climates, and heat dissipation from active telecom equipment such as radios, RRUs, and power units. AI-driven simulations help predict long-term behavior, reduce thermal stress risks, and ensure safe operation in diverse environmental conditions.",
-    link: "/services/thermal",
+  
     code: "09",
     image: heroTower,
   },
@@ -112,7 +113,6 @@ const services = [
     desc: "Inspection-driven repair plans to restore strength, prevent failure, and extend tower service life.",
     details:
       "ATSS provides corrosion assessment and mitigation services to evaluate material degradation caused by environmental exposure, aging, and operational conditions. Our corrosion analysis includes visual inspections, section loss evaluation, coating condition assessment, and remaining life estimation. Based on findings, we develop structural modification and strengthening solutions such as member replacement, reinforcement, protective coating systems, and corrosion-resistant design upgrades to extend asset life and ensure continued structural safety.",
-    link: "/services/corrosion-analysis",
     code: "11",
     image: services5,
   },
@@ -124,7 +124,7 @@ const Services = () => {
 
   return (
     <section className="relative py-16 md:py-24 bg-background">
-      <div className="relative container-px mx-auto">
+     <div className="relative w-full px-6 md:px-12 lg:px-20">
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {services.map((s, i) => {
             const Icon = s.icon;
@@ -141,11 +141,11 @@ const Services = () => {
                 className="group relative overflow-hidden rounded-2xl border border-border bg-card text-left transition-all duration-500 hover:border-primary/40 hover:shadow-[var(--shadow-elevated)] hover:-translate-y-1"
               >
                 <img
-                  src={s.image}
-                  alt={s.title}
-                  className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                />
-                <div className="absolute inset-0 bg-black/35 transition-colors duration-300 group-hover:bg-black/30" />
+  src={s.image}
+  alt={s.title}
+  className={`absolute inset-0 h-full w-full object-cover transition-all duration-500 group-hover:scale-105 ${isActive ? "scale-105 blur-sm" : ""}`}
+/>
+              <div className={`absolute inset-0 transition-all duration-500 ${isActive ? "bg-black/60 backdrop-blur-sm" : "bg-black/35 group-hover:bg-black/30"}`} />
 
                 <div className="relative flex min-h-[28rem] flex-col justify-between p-7 text-white">
                   <div className="relative flex items-start justify-between">

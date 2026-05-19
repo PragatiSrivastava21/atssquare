@@ -12,6 +12,8 @@ export default {
     },
     extend: {
       fontFamily: {
+         playfair: ['"Playfair Display"', 'serif'],
+         poppins: ['Poppins', 'sans-serif'],
         sans: ['Inter', 'system-ui', 'sans-serif'],
         display: ['Space Grotesk', 'Inter', 'sans-serif'],
       },

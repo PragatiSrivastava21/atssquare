@@ -12,7 +12,7 @@ import { useRef } from "react";
 import aboutHeroBg from "@/assets/about-hero-bg.png";
 
 const values = [
-  { icon: Target, title: "Precision", desc: "Every analysis is grounded in rigorous science and international standards." },
+  { icon: Target, title: "Rigorous Processes", desc: "In Structural Engineering, there’s no margin for error—our rigorous processes ensure every engineering detail is meticulously reviewed for precise and accurate results." },
   { icon: Eye, title: "Transparency", desc: "Clear reporting, honest timelines, and no hidden costs — ever." },
   { icon: Shield, title: "Safety First", desc: "Zero structural failures on record. Safety is non-negotiable." },
   { icon: Users, title: "Partnership", desc: "We embed with your team, not just deliver reports." },
@@ -191,13 +191,13 @@ const About = () => {
         <div className="absolute inset-0 bg-gradient-to-b from-[hsl(217,67%,7%)/0.7] via-[hsl(217,67%,12%)/0.6] to-background" />
         <div className="absolute inset-0 bg-gradient-to-r from-[hsl(217,67%,7%)/0.5] via-transparent to-transparent" />
 
-        <div className="container-px relative z-10 mx-auto pt-5 pb-20">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7 }}
-            className="max-w-3xl"
-          >
+       <div className="relative z-10 w-full pt-5 pb-20 px-6 md:px-16 lg:px-24">
+  <motion.div
+    initial={{ opacity: 0, y: 30 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ duration: 0.7 }}
+    className="max-w-3xl text-left"
+  >
             <span className="inline-block rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
               About ATSS
             </span>

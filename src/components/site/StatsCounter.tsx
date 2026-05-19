@@ -23,8 +23,8 @@ const useCounter = (end: number, duration: number, inView: boolean) => {
 
 const stats = [
   { value: 12200, suffix: "+", label: "Towers Analyzed" },
-  { value: 99.99, suffix: "%", label: "Target Accuracy", decimals: 2 },
-  { value: 14, suffix: " states", label: "Service Provided" },
+  { value: 99.99, suffix: "%", label: "Targeted Accuracy", decimals: 2 },
+  { value: 20, suffix: "+ states", label: "Service Provided" },
   { value: 25, suffix: " yrs+", label: "Years of Experience" },
 ];
 

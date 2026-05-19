@@ -20,7 +20,7 @@ const CEOSection = () => {
           <p className="mt-6 text-base leading-relaxed text-muted-foreground max-w-xl">
             At ATSS, our vision is to redefine telecom infrastructure engineering
             through innovation, precision, and reliability. Under the leadership of
-            our CEO, the company continues to deliver advanced tower structural
+            our Vision Head, the company continues to deliver advanced tower structural
             solutions that help build stronger and smarter connectivity networks.
             Our focus is not only on engineering excellence but also on creating
             long-term value for clients through technology-driven solutions.
@@ -30,10 +30,10 @@ const CEOSection = () => {
             <div className="h-px w-12 bg-accent" />
             <div>
               <p className="font-display text-lg font-semibold text-foreground">
-               Nitesh Ahuja
+               Nitesh Ahuja, P.E
               </p>
               <p className="text-sm text-muted-foreground">
-                Advanced Tower Structural Solutions
+                - President ATSS
               </p>
             </div>
           </div>

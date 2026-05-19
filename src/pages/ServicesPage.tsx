@@ -4,7 +4,7 @@ import Footer from "@/components/site/Footer";
 import Services from "@/components/site/Services";
 import CTA from "@/components/site/CTA";
 import { motion } from "framer-motion";
-import wireframeTower from "@/assets/services.png";
+import wireframeTower from "@/assets/serv.png";
 
 const ServicesPage = () => {
   useLenis();
@@ -26,13 +26,13 @@ const ServicesPage = () => {
         <div className="absolute inset-0 bg-gradient-to-b from-[hsl(217,67%,7%)/0.7] via-[hsl(217,67%,12%)/0.6] to-background" />
         <div className="absolute inset-0 bg-gradient-to-r from-[hsl(217,67%,7%)/0.5] via-transparent to-transparent" />
 
-        <div className="container-px relative z-10 mx-auto pt-5 pb-20">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7 }}
-            className="max-w-3xl"
-          >
+           <div className="relative z-10 w-full pt-5 pb-20 px-6 md:px-16 lg:px-24">
+  <motion.div
+    initial={{ opacity: 0, y: 30 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ duration: 0.7 }}
+    className="max-w-3xl text-left"
+  >
             <span className="inline-block rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
               Our Services
             </span>

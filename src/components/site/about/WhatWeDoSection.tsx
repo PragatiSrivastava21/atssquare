@@ -1,46 +1,43 @@
 import { motion } from "framer-motion";
 import { Activity, Layers, Building2, Antenna, Wind, Settings, ArrowRight } from "lucide-react";
-import { useNavigate } from "react-router-dom";
 
 const services = [
   {
     icon: Activity,
     title: "Tower Structural Analysis",
     desc: "Comprehensive structural integrity assessment ensuring safety and compliance with all applicable standards.",
+    accent: "#0a1640",
   },
   {
     icon: Settings,
     title: "Fatigue Analysis",
-    desc: "Evaluating long-term structural behavior(including its material and shape) under cyclic loading to prevent structural failure.",
+    desc: "Evaluating long-term structural behavior under cyclic loading to prevent structural failure.",
+    accent: "#1a3080",
   },
   {
     icon: Layers,
     title: "Foundation Analysis",
-    desc: "Geotechnical-driven foundation review, retrofit and new foundation designs withuplift assessment for all tower types.",
+    desc: "Geotechnical-driven foundation review, retrofit and new foundation designs for all tower types.",
+    accent: "#0a1640",
   },
   {
     icon: Antenna,
-    title: "Antenna Mount Analysis",
+    title: "Mount Analysis",
     desc: "Mount capacity evaluation and reinforcement design for 5G and next-gen equipment.",
+    accent: "#1a3080",
   },
   {
     icon: Wind,
-    title: "FEA / CFD Simulation",
-    desc: "FEA of critical structures to enhance its performance. ENhancing tower longitivity and performance using advanced method like CFD and FEA simulations",
-  },
-  {
-    icon: Building2,
-    title: "Telecom Infrastructure Optimization",
-    desc: "End-to-end solutions to maximize network capacity while minimizing structural risk.",
+    title: "FEA & CFD Simulation",
+    desc: "Enhancing tower longevity and performance using advanced FEA and CFD simulation methods.",
+    accent: "#0a1640",
   },
 ];
 
 const styles = `
   @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Lato:wght@300;400;700&display=swap');
 
-  .wwd-section {
-    font-family: 'Lato', sans-serif;
-  }
+  .wwd-section { font-family: 'Lato', sans-serif; }
 
   .wwd-badge {
     display: inline-block;
@@ -82,7 +79,7 @@ const styles = `
     line-height: 1.7;
   }
 
-  /* ── Service Card ── */
+  /* ── Card ── */
   .wwd-card {
     position: relative;
     border-radius: 20px;
@@ -93,6 +90,9 @@ const styles = `
     box-shadow: 0 2px 16px rgba(10,22,64,0.06);
     transition: transform 0.35s ease, box-shadow 0.35s ease, border-color 0.35s ease;
     cursor: default;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
   }
 
   .wwd-card:hover {
@@ -101,7 +101,7 @@ const styles = `
     border-color: rgba(10,22,64,0.07);
   }
 
-  /* Animated border edges — draw clockwise */
+  /* Animated border edges */
   .wwd-border-top, .wwd-border-right,
   .wwd-border-bottom, .wwd-border-left {
     position: absolute;
@@ -120,7 +120,6 @@ const styles = `
   .wwd-card:hover .wwd-border-bottom { width: 100%; }
   .wwd-card:hover .wwd-border-left   { height: 100%; }
 
-  /* Inner glow */
   .wwd-glow {
     position: absolute; inset: 0;
     border-radius: 20px;
@@ -131,7 +130,6 @@ const styles = `
   }
   .wwd-card:hover .wwd-glow { opacity: 1; }
 
-  /* Icon */
   .wwd-icon {
     display: grid; place-items: center;
     width: 52px; height: 52px;
@@ -143,6 +141,7 @@ const styles = `
     transition: background 0.35s ease, color 0.35s ease,
                 border-color 0.35s ease, box-shadow 0.35s ease, transform 0.35s ease;
     position: relative; z-index: 1;
+    flex-shrink: 0;
   }
   .wwd-card:hover .wwd-icon {
     background: linear-gradient(135deg, #0a1640, #1a3080);
@@ -152,7 +151,6 @@ const styles = `
     transform: rotate(-6deg) scale(1.1);
   }
 
-  /* Card title */
   .wwd-title {
     font-family: 'Playfair Display', serif;
     font-size: 1.05rem; font-weight: 700;
@@ -172,7 +170,6 @@ const styles = `
   }
   .wwd-card:hover .wwd-title::after { width: 36px; }
 
-  /* Card desc */
   .wwd-desc {
     margin-top: 0.6rem;
     font-size: 0.875rem;
@@ -180,10 +177,10 @@ const styles = `
     line-height: 1.75; font-weight: 400;
     position: relative; z-index: 1;
     transition: color 0.3s ease;
+    flex: 1;
   }
   .wwd-card:hover .wwd-desc { color: #2e3e5c; }
 
-  /* Corner dot */
   .wwd-dot {
     position: absolute; bottom: 14px; right: 14px;
     width: 6px; height: 6px; border-radius: 50%;
@@ -194,12 +191,6 @@ const styles = `
   .wwd-card:hover .wwd-dot { background: #c9a84c; transform: scale(1.6); }
 
   /* ── CTA Button ── */
-  .wwd-cta-wrap {
-    display: flex;
-    justify-content: center;
-    margin-top: 3rem;
-  }
-
   .wwd-btn {
     position: relative;
     display: inline-flex;
@@ -219,44 +210,30 @@ const styles = `
     overflow: hidden;
     box-shadow: 0 4px 20px rgba(10,22,64,0.3), 0 1px 4px rgba(10,22,64,0.2);
     transition: transform 0.3s ease, box-shadow 0.3s ease;
-    text-decoration: none;
   }
-
-  /* Gold shimmer sweep on hover */
   .wwd-btn::before {
     content: '';
-    position: absolute;
-    inset: 0;
+    position: absolute; inset: 0;
     background: linear-gradient(135deg, #b8962e 0%, #f0d060 50%, #b8962e 100%);
     opacity: 0;
     transition: opacity 0.35s ease;
     border-radius: 9999px;
   }
-
   .wwd-btn:hover::before { opacity: 1; }
   .wwd-btn:hover {
     color: #0a1628;
     transform: translateY(-3px) scale(1.03);
     box-shadow: 0 10px 32px rgba(184,150,46,0.4), 0 2px 8px rgba(10,22,64,0.15);
   }
-
   .wwd-btn span, .wwd-btn svg {
     position: relative; z-index: 1;
     transition: color 0.35s ease;
   }
-
-  /* Arrow nudge on hover */
-  .wwd-btn:hover .wwd-arrow {
-    transform: translateX(4px);
-    transition: transform 0.3s ease;
-  }
+  .wwd-btn:hover .wwd-arrow { transform: translateX(4px); }
   .wwd-arrow { transition: transform 0.3s ease; }
-
-  /* Outer ring pulse on hover */
   .wwd-btn::after {
     content: '';
-    position: absolute;
-    inset: -3px;
+    position: absolute; inset: -3px;
     border-radius: 9999px;
     border: 2px solid rgba(184,150,46,0);
     transition: border-color 0.35s ease, inset 0.35s ease;
@@ -265,15 +242,70 @@ const styles = `
     border-color: rgba(184,150,46,0.5);
     inset: -5px;
   }
+
+  /* ── Second row centering ── */
+  .wwd-second-row {
+    display: flex;
+    justify-content: center;
+    gap: 1.25rem; /* matches gap-5 = 20px */
+    flex-wrap: wrap;
+  }
+
+  /* On mobile & tablet the second row fills full width */
+  @media (max-width: 1023px) {
+    .wwd-second-row-card {
+      width: 100%;
+    }
+  }
+
+  /* On desktop: each second-row card matches exactly 1/3 of the grid width */
+  @media (min-width: 1024px) {
+    .wwd-second-row-card {
+      /* 
+        Grid has 3 columns with gap-5 (20px).
+        Card width = (100% - 2*20px) / 3
+        Use calc to mirror the CSS grid column sizing.
+      */
+      width: calc((100% - 2 * 1.25rem) / 3);
+      max-width: calc((100% - 2 * 1.25rem) / 3);
+    }
+  }
 `;
 
+const ServiceCard = ({ service, index }) => {
+  const Icon = service.icon;
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 30 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-40px" }}
+      transition={{ duration: 0.6, delay: index * 0.07 }}
+      className="wwd-card"
+    >
+      <span className="wwd-border-top" />
+      <span className="wwd-border-right" />
+      <span className="wwd-border-bottom" />
+      <span className="wwd-border-left" />
+      <div className="wwd-glow" />
+      <div className="wwd-dot" />
+      <div className="wwd-icon">
+        <Icon size={22} />
+      </div>
+      <h3 className="wwd-title">{service.title}</h3>
+      <p className="wwd-desc">{service.desc}</p>
+    </motion.div>
+  );
+};
+
 const WhatWeDoSection = () => {
-  const navigate = useNavigate();
+  const firstRow = services.slice(0, 3);
+  const secondRow = services.slice(3);
 
   return (
-    <section className="wwd-section py-20 md:py-28 container-px mx-auto">
+    <section className="wwd-section py-20 md:py-28 px-4 sm:px-6 lg:px-8 max-w-8xl mx-auto">
       <style>{styles}</style>
 
+      {/* Header */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
@@ -290,44 +322,31 @@ const WhatWeDoSection = () => {
         </p>
       </motion.div>
 
-      <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-        {services.map((s, i) => {
-          const Icon = s.icon;
-          return (
-            <motion.div
-              key={s.title}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-40px" }}
-              transition={{ duration: 0.6, delay: i * 0.07 }}
-              className="wwd-card"
-            >
-              <span className="wwd-border-top" />
-              <span className="wwd-border-right" />
-              <span className="wwd-border-bottom" />
-              <span className="wwd-border-left" />
-              <div className="wwd-glow" />
-              <div className="wwd-dot" />
-
-              <div className="wwd-icon">
-                <Icon size={22} />
-              </div>
-              <h3 className="wwd-title">{s.title}</h3>
-              <p className="wwd-desc">{s.desc}</p>
-            </motion.div>
-          );
-        })}
+      {/* Row 1 — CSS Grid: 1 col → 2 col → 3 col */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+        {firstRow.map((s, i) => (
+          <ServiceCard key={s.title} service={s} index={i} />
+        ))}
       </div>
 
-      {/* CTA Button */}
+      {/* Row 2 — Flexbox centered; cards match grid column width on desktop */}
+      <div className="wwd-second-row mt-5">
+        {secondRow.map((s, i) => (
+          <div key={s.title} className="wwd-second-row-card">
+            <ServiceCard service={s} index={i + 3} />
+          </div>
+        ))}
+      </div>
+
+      {/* CTA */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
         transition={{ duration: 0.6, delay: 0.3 }}
-        className="wwd-cta-wrap"
+        className="flex justify-center mt-12"
       >
-        <button className="wwd-btn" onClick={() => navigate("/services")}>
+        <button className="wwd-btn">
           <span>Explore All Services</span>
           <ArrowRight size={17} className="wwd-arrow" />
         </button>

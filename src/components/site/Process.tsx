@@ -12,17 +12,17 @@ const steps = [
  {
   icon: LineChart,
   title: "Analysis",
-  desc: `Structural engineering models are developed using widely adopted industry-standard software platforms to analyze and validate tower performance under various loading conditions. The structures are designed and assessed in accordance with TIA-222 standards and applicable local codes, ensuring structural safety, compliance, reliability, and optimized performance for real-world telecom infrastructure environments.`
+  desc: `Structural engineering models are developed using widely adopted industry-standard software platforms to analyze and validate tower performance under various loading conditions. The structures are designed and assessed in accordance with TIA-222 ,AIC-7 10,AIC-7 16,AIC-7 22,AWS D1.1 standards and any applicable local codes, ensuring structural safety, compliance, reliability, and optimized performance for real-world telecom infrastructure environments.`
 },
   {
   icon: Cpu,
   title: "Simulation",
-  desc: `Advanced Finite Element Analysis (FEA) and Computational Fluid Dynamics (CFD) simulations are performed to evaluate structural behavior under extreme wind, seismic, and fatigue loading conditions. These studies ensure long-term structural reliability, stability, and performance across demanding 50-year design life scenarios.`
+  desc: `Advanced Finite Element Analysis (FEA) and Computational Fluid Dynamics (CFD) simulations are performed to evaluate structural behavior under extreme wind, seismic,thermal and fatigue loading conditions. These studies ensure long-term structural reliability, stability, and performance across demanding 50-year design life scenarios.`
 },
 {
   icon: Settings2,
   title: "Optimization",
-  desc: `We engineer highly optimized retrofit solutions that achieve the ideal balance between minimum steel utilization and maximum structural integrity. Our approach reduces project costs, improves constructability, and enhances the long-term performance of existing telecom infrastructure.`
+  desc: `We engineer highly optimized retrofit solutions that achieve the ideal balance between minimum steel utilization and maximum structural integrity. Our approach reduces project costs, improves constructability, and enhances the long-term performance of existing as well as new telecom infrastructure.`
 },
 {
   icon: ShieldCheck,
@@ -32,7 +32,7 @@ const steps = [
 {
   icon: PackageCheck,
   title: "Delivery",
-  desc: `Professionally stamped engineering drawings, fabrication details, and complete Bills of Materials (BOM) are prepared and delivered to your construction team for seamless execution. This ensures accurate implementation, efficient coordination, and compliance with project requirements and engineering standards.`
+  desc: `Professionally stamped engineering drawings, modification drawings, fabrication details, and complete Bills of Materials (BOM) are prepared and delivered to your construction team for seamless execution. This ensures accurate implementation, efficient coordination, and compliance with project requirements and engineering standards.`
 },
 ];
 
@@ -49,7 +49,7 @@ const Process = () => {
             <span className="text-gradient-fire">approved designs</span>
           </h2>
           <p className="mt-5 text-muted-foreground">
-            Five rigorous phases. Average turnaround of 14 business days.
+            Six rigorous phases. Average turnaround of 2-3 business days.
           </p>
         </div>
 

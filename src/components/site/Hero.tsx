@@ -5,7 +5,8 @@ import { ArrowRight, Radio } from "lucide-react";
 import t1 from "@/assets/2.png";
 import t2 from "@/assets/towerr.png";
 import t3 from "@/assets/tower.png";
-import t4 from "@/assets/1.jpeg";
+import t4 from "@/assets/guide.png";
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet"></link>
 
 const slides = [
   {
@@ -43,7 +44,7 @@ const slides = [
     headlineAccent: "engineered",
     headlinePost: "for zero failure.",
     subtitle:
-      "Joint-level FEA, weld and bolt verification — because the smallest detail decides whether a tower stands or falls.",
+      "Connections, weld and bolt verification — because the smallest detail decides whether a tower stands or falls.",
   },
 ];
 
@@ -98,7 +99,7 @@ const Hero = () => {
             className="inline-flex items-center gap-2 rounded-full border border-border/10 bg-white px-4 py-1.5 text-xs font-medium text-muted-foreground backdrop-blur"
           >
             <Radio className="h-3.5 w-3.5 text-accent" />
-            Trusted by carriers across 14 countries
+            Trusted by carriers across U.S.A
           </motion.div>
 
           <AnimatePresence mode="wait">
@@ -128,7 +129,7 @@ const Hero = () => {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
               transition={{ duration: 0.6, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
-              className="mt-6 max-w-xl text-lg leading-relaxed text-muted-foreground"
+              className="mt-6 max-w-xl text-lg leading-relaxed text-black text-semibold"
             >
               {slides[i].subtitle}
             </motion.p>
@@ -140,11 +141,12 @@ const Hero = () => {
             transition={{ duration: 0.8, delay: 0.4 }}
             className="mt-10 flex flex-wrap items-center gap-4"
           >
-            <Link
-              to="/services"
-              className="group inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-slate-900 via-blue-700 to-blue-500 px-6 py-3.5 text-sm font-semibold text-white shadow-[0_0_36px_rgba(15,23,42,0.3)] transition-all hover:shadow-[0_0_80px_rgba(59,130,246,0.35)]"
-            >
-              Explore Services
+           <Link
+  to="/services"
+  className="group inline-flex items-center gap-2 text-xl rounded-xl bg-gradient-to-r from-slate-900 via-blue-700 to-blue-500 px-6 py-3.5 text-sm font-semibold font-playfair text-white shadow-[0_0_36px_rgba(15,23,42,0.3)] transition-all hover:shadow-[0_0_80px_rgba(59,130,246,0.35)]"
+>
+  Explore Services
+
               <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
             </Link>
           </motion.div>

@@ -8,37 +8,37 @@ const sections = [
   {
     icon: Globe,
     title: "1. Website Usage",
-    body: "By accessing or using the ATSS website, you agree to these Terms & Conditions and all applicable laws. You may use the site for lawful, informational, and business purposes only. We may modify, suspend, or discontinue any part of the site without prior notice.",
+    body: "The content on this website is provided for general information purposes only. While we strive to keep the information up to date and accurate, we make no representations or warranties of any kind, express or implied, about the completeness, accuracy, reliability, or availability of the website or the information, products, services, or related graphics contained on the website.Unauthorized use of this website may give rise to a claim for damages and/or be a criminal offense.",
   },
   {
     icon: UserCog,
-    title: "2. User Responsibilities",
-    body: "You agree to provide accurate information, maintain the confidentiality of any credentials, and not engage in activities that disrupt the site, infringe on others' rights, or violate applicable laws or regulations.",
+    title: "2.  Intellectual Property",
+    body: "All content on the ATSS website, including but not limited to text, graphics, logos, images, and software, is the property of ATSS and is protected by copyright and other intellectual property laws. Unauthorized use or reproduction of any content is strictly prohibited.You may not use any content from our website for commercial purposes without obtaining a license from us or our licensors.",
   },
   {
     icon: CreditCard,
-    title: "3. Payments & Refunds",
-    body: "Engineering services are billed per the signed Statement of Work. Invoices are due within agreed terms. Refunds, where applicable, are governed by the project agreement. Late payments may incur interest charges as outlined in the contract.",
+    title: "3. Client Responsibilities",
+    body: "Clients are responsible for providing accurate and complete information required for the successful execution of services.To avoid delays or additional costs, clients must ensure timely communication and cooperation during the project lifecycle.Any modifications or changes requested by the client after the commencement of a project may incur additional fees.",
   },
   {
     icon: Copyright,
-    title: "4. Intellectual Property",
-    body: "All content, branding, designs, reports, drawings, and software on this site are owned by ATSS or its licensors and are protected by copyright and trademark laws. You may not reproduce, distribute, or create derivative works without prior written consent.",
+    title: "4. Payment Terms",
+    body: "Payment terms will be clearly outlined in the contract or agreement between ATSS and the client. Payments are typically required in stages, with the final payment due upon project completion.In the event of non-payment or late payment, ATSS reserves the right to suspend or terminate services until the outstanding balance is paid in full.",
   },
   {
     icon: AlertTriangle,
     title: "5. Limitation of Liability",
-    body: "To the fullest extent permitted by law, ATSS is not liable for indirect, incidental, or consequential damages arising from your use of the site. Engineering deliverables are governed by the terms of the relevant project contract.",
+    body: "ATSS will not be liable for any direct, indirect, incidental, or consequential damages arising out of or in connection with the use of our services or website. This includes, but is not limited to, loss of data, loss of profits, or business interruption.While we make every effort to ensure the accuracy and reliability of our services, we do not guarantee that our solutions will meet all of your specific requirements or that they will be error-free.",
   },
   {
     icon: XCircle,
-    title: "6. Termination",
-    body: "We may suspend or terminate access to the site at our discretion if you violate these terms. Provisions related to intellectual property, liability, and governing law survive termination.",
+    title: "6.  Confidentiality",
+    body: "ATSS is committed to maintaining the confidentiality of all client information and project details. We will not disclose any information to third parties without the client’s prior consent, except as required by law.",
   },
   {
     icon: Mail,
-    title: "7. Contact Information",
-    body: "Questions about these terms? Contact us at engineering@atss.com or 1200 Tower Drive, Suite 400, Dallas, TX 75201.",
+    title: "7.  Termination",
+    body: "ATSS reserves the right to terminate any service agreement if the client breaches any of these Terms and Conditions or the specific terms outlined in the contract. Upon termination, the client is responsible for paying any outstanding balances for services rendered up to the termination date.",
   },
 ];
 
@@ -52,7 +52,7 @@ const Terms = () => {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7 }}
-          className="max-w-3xl"
+          className="max-w-5xl mx-auto text-center"
         >
           <span className="inline-block rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
             Legal
@@ -60,7 +60,7 @@ const Terms = () => {
           <h1 className="mt-5 font-display text-4xl font-semibold tracking-tight md:text-6xl">
             Terms & <span className="text-gradient-hero">Conditions</span>
           </h1>
-          <p className="mt-6 text-lg text-muted-foreground">
+          <p className="mt-6 text-lg text-slate-800">
             The rules and guidelines for using the ATSS website and services. Last updated: January 2026.
           </p>
         </motion.div>
@@ -85,7 +85,7 @@ const Terms = () => {
                   </div>
                   <div>
                     <h2 className="font-display text-xl font-semibold">{s.title}</h2>
-                    <p className="mt-2 text-sm text-muted-foreground leading-relaxed">{s.body}</p>
+                    <p className="mt-2 text-sm text-slate-800 leading-relaxed">{s.body}</p>
                   </div>
                 </div>
               </motion.article>
