@@ -10,7 +10,7 @@ const steps = [
   {
     icon: LineChart,
     title: "Analysis",
-    desc: `Structural engineering models are developed using widely adopted industry-standard software platforms to analyze and validate tower performance under various loading conditions. The structures are designed and assessed in accordance with TIA-222, AIC-7 10, AIC-7 16, AIC-7 22, AWS D1.1 standards and any applicable local codes, ensuring structural safety, compliance, reliability, and optimized performance for real-world telecom infrastructure environments.`,
+    desc: `Structural engineering models are developed using widely adopted industry-standard software platforms to analyze and validate tower performance under various loading conditions. The structures are designed and assessed in accordance with TIA-222, ASCE7-10, ASCE7- 16, ASCE7- 22, AWS D1.1 standards and any applicable local codes, ensuring structural safety, compliance, reliability, and optimized performance for real-world telecom infrastructure environments.`,
   },
   {
     icon: Cpu,
