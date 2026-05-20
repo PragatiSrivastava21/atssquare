@@ -30,7 +30,7 @@ const team: TeamMember[] = [
   },
  
   {
-    name: "Others",
+    name: "Project Managers",
     role: "Engineering",
     bio: "Specialized in reviewing reports and providing insights for various engineering aspects.",
   },

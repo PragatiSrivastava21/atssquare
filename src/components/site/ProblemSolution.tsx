@@ -14,6 +14,27 @@ L.Icon.Default.mergeOptions({
   shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
 });
 
+// ── Responsive hook ─────────────────────────────────────────────────────────
+
+function useBreakpoint() {
+  const [width, setWidth] = useState(
+    typeof window !== "undefined" ? window.innerWidth : 1200
+  );
+  useEffect(() => {
+    const handler = () => setWidth(window.innerWidth);
+    window.addEventListener("resize", handler);
+    return () => window.removeEventListener("resize", handler);
+  }, []);
+  return {
+    isMobile: width < 640,
+    isTablet: width >= 640 && width < 1024,
+    isDesktop: width >= 1024,
+    width,
+  };
+}
+
+// ── Data types ──────────────────────────────────────────────────────────────
+
 interface ServiceItem { label: string; count: number; }
 interface StateData {
   id: string; state: string; abbr: string;
@@ -68,29 +89,15 @@ const rawStateData: StateData[] = [
     services: [{ label: "Preliminary Design", count: 3 }, { label: "Full SA / Tower Analysis", count: 1 }] },
   { id: "ME", state: "Maine", abbr: "ME", lat: 43.6615, lng: -70.2553, total: 4,
     services: [{ label: "SA Review", count: 3 }, { label: "Full SA", count: 1 }] },
-  { id: "VA", state: "Virginia", abbr: "VA", lat: 37.5407, lng: -77.436, total: 3,
+  { id: "VA", state: "Virginia", abbr: "VA", lat: 37.5407, lng: -77.436, total: 5,
     services: [{ label: "Full SA / Monopole Analysis", count: 3 }] },
-  { id: "TX", state: "Texas", abbr: "TX", lat: 32.7767, lng: -96.797, total: 1,
+  { id: "TX", state: "Texas", abbr: "TX", lat: 32.7767, lng: -96.797, total: 15,
     services: [{ label: "SA Review", count: 1 }] },
-  { id: "CA", state: "California", abbr: "CA", lat: 36.7783, lng: -119.4179, total: 1,
-    services: [{ label: "Preliminary Design", count: 1 }] },
-  { id: "AZ", state: "Arizona", abbr: "AZ", lat: 33.4484, lng: -112.074, total: 1,
+  { id: "FL", state: "Florida", abbr: "FL", lat: 27.9944, lng: -81.7603, total: 8,
     services: [{ label: "Full SA", count: 1 }] },
-  { id: "FL", state: "Florida", abbr: "FL", lat: 27.9944, lng: -81.7603, total: 1,
+  { id: "NC", state: "North Carolina", abbr: "NC", lat: 35.2271, lng: -80.8431, total: 3,
     services: [{ label: "Full SA", count: 1 }] },
-  { id: "NC", state: "North Carolina", abbr: "NC", lat: 35.2271, lng: -80.8431, total: 1,
-    services: [{ label: "Full SA", count: 1 }] },
-    { id: "FL", state: "Florida", abbr: "FL", lat: 27.9944, lng: -81.7603, total: 1,
-    services: [{ label: "Full SA", count: 1 }] },
-     { id: "WV", state: "West Virginia", abbr: "WV", lat: 38.5976, lng: -80.4549, total: 1,
-    services: [{ label: "Full SA", count: 1 }] },
-     { id: "VA", state: "Virginia", abbr: "VA", lat: 37.5407, lng: -77.436, total: 1,
-    services: [{ label: "Full SA", count: 1 }] },
-     { id: "TX", state: "Texas", abbr: "TX", lat: 32.7767, lng: -96.797, total: 1,
-    services: [{ label: "Full SA", count: 1 }] },
-     { id: "KY", state: "Kentucky", abbr: "KY", lat: 38.2527, lng: -85.7585, total: 1,
-    services: [{ label: "Full SA", count: 1 }] },
-     { id: "NC", state: "North Carolina", abbr: "NC", lat: 35.2271, lng: -80.8431, total: 1,
+  { id: "WV", state: "West Virginia", abbr: "WV", lat: 38.5976, lng: -80.4549, total: 3,
     services: [{ label: "Full SA", count: 1 }] },
 ];
 
@@ -99,7 +106,7 @@ const stateData: StateData[] = rawStateData.map(s => ({
   services: groupSAServices(s.services),
 }));
 
-// ── Marker helpers (unchanged) ──────────────────────────────────────────────
+// ── Marker helpers ──────────────────────────────────────────────────────────
 
 function getMarkerTier(total: number) {
   if (total >= 20) return { size: 42, ring: true };
@@ -129,7 +136,7 @@ function makeIcon(s: StateData, isActive: boolean): L.DivIcon {
   return L.divIcon({ html, className: "", iconSize: [sz+16, sz+16], iconAnchor: [(sz+16)/2, (sz+16)/2], popupAnchor: [0, -(sz/2+8)] });
 }
 
-// ── Map sub-components (unchanged) ─────────────────────────────────────────
+// ── Map sub-components ──────────────────────────────────────────────────────
 
 function SetInitialView() {
   const map = useMap();
@@ -143,27 +150,26 @@ function FlyTo({ state }: { state: StateData | null }) {
   return null;
 }
 
-// ── Static summary data ─────────────────────────────────────────────────────
+// ── Summary data ────────────────────────────────────────────────────────────
 
 const SUMMARY_PIE = [
   { name: "Passing SA",      value: 125, color: "#3B82F6" },
-  { name: "Full SA",      value: 97, color: "#d80e1896" },
-  { name: "Passing SA Reviews",      value: 158, color: "#fa7305" },
-  { name: "Mod SA",      value: 28, color: "#e2cd0a" },
-  { name: "Failing SA",      value: 16, color: "#850541" },
-  { name: "Mod Drawing",         value: 28,  color: "#EF4444" },
-  { name: "Re-runs",             value: 19,   color: "#06B6D4" },
-  { name: "Prelim Design",       value: 19,   color: "#84CC16" },
-  { name: "Closeout Reports",    value: 15,   color: "#6366F1" },
-  { name: "Inspection Reports",  value: 17,   color: "#0e574e" },
-  { name: "Guyed Tower Reviews", value: 3,   color: "#EC4899" },
-  { name: "Mount Analysis",      value: 10, color: "#F97316" },
-  { name: "Fatigue Analysis",      value: 7, color: "#8d1919" },
-  { name: "Corrosion Analysis",      value: 8, color: "#229722" },
-  { name: "CFD Analysis",      value: 6, color: "#8bf006" },
-  { name: "FEA Analysis",      value: 7, color: "#552f4dc9" },
-  { name: "Heat Study",      value: 8, color: "#10c4db" },
-  
+  { name: "Full SA",         value: 97,  color: "#d80e1896" },
+  { name: "Passing SA Reviews", value: 158, color: "#fa7305" },
+  { name: "Mod SA",          value: 28,  color: "#e2cd0a" },
+  { name: "Failing SA",      value: 16,  color: "#850541" },
+  { name: "Mod Drawing",     value: 28,  color: "#EF4444" },
+  { name: "Re-runs",         value: 19,  color: "#06B6D4" },
+  { name: "Prelim Design",   value: 19,  color: "#84CC16" },
+  { name: "Closeout Reports",value: 15,  color: "#6366F1" },
+  { name: "Inspection Reports", value: 17, color: "#0e574e" },
+  { name: "Guyed Tower Reviews", value: 3, color: "#EC4899" },
+  { name: "Mount Analysis",  value: 10,  color: "#F97316" },
+  { name: "Fatigue Analysis",value: 7,   color: "#8d1919" },
+  { name: "Corrosion Analysis", value: 8, color: "#229722" },
+  { name: "CFD Analysis",    value: 6,   color: "#8bf006" },
+  { name: "FEA Analysis",    value: 7,   color: "#552f4dc9" },
+  { name: "Heat Study",      value: 8,   color: "#10c4db" },
 ];
 
 const TOTAL_SUMMARY = SUMMARY_PIE.reduce((a, d) => a + d.value, 0);
@@ -182,71 +188,166 @@ const renderCustomLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent
   );
 };
 
-// ── DetailPanel — permanently static, never reads `selected` ────────────────
+// ── DetailPanel ─────────────────────────────────────────────────────────────
 
-function DetailPanel() {
+function DetailPanel({ layout }: { layout: "side" | "bottom" }) {
+  const isBottom = layout === "bottom";
+  const pieSize = isBottom ? 160 : 210;
+  const pieInner = isBottom ? 40 : 55;
+  const pieOuter = isBottom ? 72 : 95;
+
+  const panelStyle: React.CSSProperties = isBottom
+    ? {
+        width: "100%",
+        borderTop: "1px solid rgba(255,255,255,0.08)",
+        background: "#0d1b3e",
+        overflow: "hidden",
+        flexShrink: 0,
+      }
+    : {
+        flex: "0 0 245px",
+        display: "flex",
+        flexDirection: "column",
+        borderLeft: "1px solid rgba(255,255,255,0.08)",
+        background: "#0d1b3e",
+        overflow: "hidden",
+      };
+
   return (
-    <div style={S.panel}>
-      <div style={S.panelHeader}>
-        <p style={S.panelTitle}>Portfolio Overview</p>
-        <p style={S.panelSub}>500+ deliverables · 26 states · 15+ months</p>
-      </div>
-
-      <div style={{ display: "flex", justifyContent: "center", padding: "14px 8px 4px" }}>
-        <PieChart width={210} height={210}>
-          <Pie
-            data={SUMMARY_PIE}
-            dataKey="value"
-            nameKey="name"
-            cx={105} cy={105}
-            innerRadius={55} outerRadius={95}
-            animationBegin={0} animationDuration={600}
-            isAnimationActive={true}
-            labelLine={false}
-            label={renderCustomLabel}
-          >
-            {SUMMARY_PIE.map((d, i) => (
-              <Cell key={`cell-${i}`} fill={d.color} stroke="#0d1b3e" strokeWidth={2} />
+    <div style={panelStyle}>
+      {/* Header */}
+      <div style={{
+        padding: isBottom ? "10px 16px 8px" : "14px 16px 10px",
+        borderBottom: "1px solid rgba(255,255,255,0.07)",
+        flexShrink: 0,
+        display: isBottom ? "flex" : "block",
+        alignItems: isBottom ? "center" : undefined,
+        justifyContent: isBottom ? "space-between" : undefined,
+        gap: isBottom ? 12 : undefined,
+      }}>
+        <div>
+          <p style={{ fontSize: isBottom ? 13 : 15, fontWeight: 700, color: "#e0e8f8", margin: 0, lineHeight: 1.3, fontFamily: "'Playfair Display', Georgia, serif" }}>
+            Portfolio Overview
+          </p>
+          <p style={{ fontSize: 11, color: "#6a8aaa", marginTop: 2, marginBottom: 0, fontFamily: "'Poppins', sans-serif" }}>
+            500+ deliverables · 26 states · 15+ months
+          </p>
+        </div>
+        {/* Inline stats for bottom layout */}
+        {isBottom && (
+          <div style={{ display: "flex", gap: 8, flexShrink: 0 }}>
+            {[{ l: "States", v: "26" }, { l: "Months", v: "15+" }, { l: "Total", v: "500+" }].map(m => (
+              <div key={m.l} style={{ textAlign: "center", padding: "4px 10px", background: "rgba(255,255,255,0.04)", borderRadius: 8, border: "1px solid rgba(255,255,255,0.06)" }}>
+                <p style={{ fontSize: 14, fontWeight: 700, color: "#e0e8f8", margin: 0, fontFamily: "'Playfair Display', Georgia, serif" }}>{m.v}</p>
+                <p style={{ fontSize: 9, color: "#4a6a8a", margin: 0, fontFamily: "'Poppins', sans-serif", fontWeight: 600 }}>{m.l}</p>
+              </div>
             ))}
-          </Pie>
-          <Tooltip
-            formatter={(v: number, n: string) => [
-              `${v}+ (${Math.round(v / TOTAL_SUMMARY * 100)}%)`, n
-            ]}
-            contentStyle={{
-              fontSize: 11, borderRadius: 8,
-              border: "1px solid rgba(255,255,255,0.1)",
-              background: "#1a2d5a", color: "#e0e8f8",
-            }}
-          />
-        </PieChart>
+          </div>
+        )}
       </div>
 
-      <div style={{ padding: "0 14px 10px", overflowY: "auto", flex: 1 }}>
-        <p style={S.sectionLabel}>Service Totals</p>
-        {SUMMARY_PIE.map((d, i) => (
-          <div key={i} style={S.row}>
-            <span style={{ ...S.swatch, background: d.color }} />
-            <span style={S.rowLabel}>{d.name}</span>
-            <span style={{
-              ...S.rowCount,
-              background: `${d.color}22`, color: d.color,
-              borderRadius: 6, padding: "1px 7px", fontWeight: 800,
-            }}>
-              {Math.round(d.value / TOTAL_SUMMARY * 100)}%
-            </span>
+      {/* Body: horizontal on bottom, vertical on side */}
+      <div style={{
+        display: isBottom ? "flex" : "flex",
+        flexDirection: isBottom ? "row" : "column",
+        overflowX: isBottom ? "auto" : undefined,
+        overflowY: isBottom ? "hidden" : undefined,
+        flex: isBottom ? undefined : 1,
+        minHeight: 0,
+        alignItems: isBottom ? "flex-start" : undefined,
+      }}>
+        {/* Pie chart */}
+        <div style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          padding: isBottom ? "10px 8px 10px 16px" : "14px 8px 4px",
+          flexShrink: 0,
+        }}>
+          <PieChart width={pieSize} height={pieSize}>
+            <Pie
+              data={SUMMARY_PIE}
+              dataKey="value"
+              nameKey="name"
+              cx={pieSize / 2} cy={pieSize / 2}
+              innerRadius={pieInner} outerRadius={pieOuter}
+              animationBegin={0} animationDuration={600}
+              isAnimationActive={true}
+              labelLine={false}
+              label={renderCustomLabel}
+            >
+              {SUMMARY_PIE.map((d, i) => (
+                <Cell key={`cell-${i}`} fill={d.color} stroke="#0d1b3e" strokeWidth={2} />
+              ))}
+            </Pie>
+            <Tooltip
+              formatter={(v: number, n: string) => [
+                `${v}+ (${Math.round(v / TOTAL_SUMMARY * 100)}%)`, n
+              ]}
+              contentStyle={{
+                fontSize: 11, borderRadius: 8,
+                border: "1px solid rgba(255,255,255,0.1)",
+                background: "#1a2d5a", color: "#e0e8f8",
+              }}
+            />
+          </PieChart>
+        </div>
+
+        {/* Legend list */}
+        <div style={{
+          padding: isBottom ? "10px 16px 10px 4px" : "0 14px 10px",
+          overflowY: isBottom ? undefined : "auto",
+          overflowX: isBottom ? undefined : undefined,
+          flex: isBottom ? undefined : 1,
+          minWidth: isBottom ? 320 : undefined,
+          display: isBottom ? "flex" : "block",
+          flexDirection: isBottom ? "column" : undefined,
+          justifyContent: isBottom ? "center" : undefined,
+        }}>
+          <p style={{
+            fontSize: 10, fontWeight: 700, color: "#4a6a8a",
+            textTransform: "uppercase" as const, letterSpacing: "0.1em",
+            margin: isBottom ? "0 0 5px" : "6px 0 5px",
+            fontFamily: "'Playfair Display', Georgia, serif"
+          }}>Service Totals</p>
+          <div style={isBottom
+            ? { display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "3px 16px" }
+            : {}
+          }>
+            {SUMMARY_PIE.map((d, i) => (
+              <div key={i} style={{
+                display: "flex", alignItems: "center", gap: 7,
+                paddingBottom: 5,
+                borderBottom: "1px solid rgba(255,255,255,0.04)",
+                marginBottom: 4,
+              }}>
+                <span style={{ width: 8, height: 8, borderRadius: 2, flexShrink: 0, background: d.color }} />
+                <span style={{ flex: 1, fontSize: 11, color: "#7a9abb", fontFamily: "'Poppins', sans-serif", fontWeight: 600 }}>{d.name}</span>
+                <span style={{
+                  fontWeight: 800, fontSize: 12, color: d.color,
+                  background: `${d.color}22`,
+                  borderRadius: 6, padding: "1px 7px",
+                  fontFamily: "'Playfair Display', Georgia, serif"
+                }}>
+                  {Math.round(d.value / TOTAL_SUMMARY * 100)}%
+                </span>
+              </div>
+            ))}
           </div>
-        ))}
+        </div>
       </div>
 
-      <div style={S.statsRow}>
-        {[{ l: "States", v: "26" }, { l: "Months", v: "15+" }, { l: "Total", v: "500+" }].map(m => (
-          <div key={m.l} style={S.statCard}>
-            <p style={S.statVal}>{m.v}</p>
-            <p style={S.statLbl}>{m.l}</p>
-          </div>
-        ))}
-      </div>
+      {/* Stats footer — only on side panel */}
+      {!isBottom && (
+        <div style={{ display: "flex", borderTop: "1px solid rgba(255,255,255,0.07)", flexShrink: 0 }}>
+          {[{ l: "States", v: "26" }, { l: "Months", v: "15+" }, { l: "Total", v: "500+" }].map(m => (
+            <div key={m.l} style={{ flex: 1, padding: "10px 8px", textAlign: "center", borderRight: "1px solid rgba(255,255,255,0.05)" }}>
+              <p style={{ fontSize: 16, fontWeight: 700, color: "#e0e8f8", margin: 0, fontFamily: "'Playfair Display', Georgia, serif" }}>{m.v}</p>
+              <p style={{ fontSize: 10, color: "#4a6a8a", margin: "2px 0 0", fontFamily: "'Poppins', sans-serif", fontWeight: 600 }}>{m.l}</p>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
@@ -254,8 +355,17 @@ function DetailPanel() {
 // ── Root component ──────────────────────────────────────────────────────────
 
 export default function TowerMap() {
-  // `selected` drives ONLY marker highlight + FlyTo — never touches DetailPanel
   const [selected, setSelected] = useState<StateData | null>(null);
+  const { isMobile, isTablet, isDesktop, width } = useBreakpoint();
+
+  // Derived layout values
+  const headerPadding = isMobile ? "14px 12px 10px" : "20px 16px 14px";
+  const h1FontSize = isMobile ? 22 : isTablet ? 30 : 38;
+  const h2FontSize = isMobile ? 11 : isTablet ? 13 : 16;
+  const taglineSize = isMobile ? 11 : 13;
+  const showTagline = !isMobile;
+  const mapHeight = isMobile ? 340 : isTablet ? 480 : undefined; // undefined = flex fill
+  const shellDirection: React.CSSProperties["flexDirection"] = isDesktop ? "row" : "column";
 
   useEffect(() => {
     const id = "atss-styles";
@@ -273,53 +383,122 @@ export default function TowerMap() {
         .leaflet-control-zoom a { color: #e0e8f8 !important; background: #0d1b3e !important; font-family: 'Poppins', sans-serif !important; }
         .leaflet-control-zoom a:hover { background: #1a2d5a !important; }
         .atss-heading { animation: fadeSlideDown 0.8s cubic-bezier(0.22,1,0.36,1) both; }
+        * { box-sizing: border-box; }
       `;
       document.head.appendChild(el);
     }
   }, []);
 
   return (
-    <div style={S.page}>
-      {/* ── Decorative Header ── */}
-      <div style={S.headerWrap} className="atss-heading">
-        <div style={S.ruleRow}>
-          <div style={S.ruleLine} />
-          <div style={S.ruleDiamond} />
-          <div style={S.ruleLine} />
+    <div style={{
+      fontFamily: "'Poppins', system-ui, sans-serif",
+      background: "#080f22",
+      minHeight: "100vh",
+      display: "flex",
+      flexDirection: "column",
+      padding: headerPadding,
+    }}>
+      {/* ── Header ── */}
+      <div style={{ width: "100%", marginBottom: isMobile ? 10 : 14 }} className="atss-heading">
+        {/* Top rule */}
+        <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: isMobile ? 6 : 10 }}>
+          <div style={{ flex: 1, height: 1, background: "linear-gradient(90deg, transparent, rgba(232,200,74,0.4), transparent)" }} />
+          <div style={{ width: 7, height: 7, background: "#e8c84a", transform: "rotate(45deg)", flexShrink: 0 }} />
+          <div style={{ flex: 1, height: 1, background: "linear-gradient(90deg, transparent, rgba(232,200,74,0.4), transparent)" }} />
         </div>
 
-        <div style={S.headerCenter}>
-          <span style={S.eyebrow}>ATSS · Active Project Portfolio</span>
-          <h1 style={S.h1}>Interactive Coverage Map</h1>
-          <h2 style={S.h2}>of Active Tower Structural Engineering Projects</h2>
-          <p style={S.tagline}>
-            Showcasing ATSS's expanding infrastructure footprint through detailed analyses,
-            modification drawings, and engineering deliverables.
-          </p>
-          <div style={S.statStrip}>
+        {/* Center block */}
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center", marginBottom: isMobile ? 8 : 14, padding: "0 8px" }}>
+          <span style={{
+            display: "block", fontSize: isMobile ? 8 : 10, fontWeight: 600,
+            letterSpacing: "0.22em", textTransform: "uppercase",
+            color: "#e8c84a", marginBottom: isMobile ? 6 : 10,
+            fontFamily: "'Playfair Display', Georgia, serif"
+          }}>ATSS · Active Project Portfolio</span>
+
+          <h1 style={{
+            fontFamily: "'Playfair Display', Georgia, serif",
+            fontSize: h1FontSize,
+            fontWeight: 800, color: "#e0e8f8",
+            letterSpacing: "0.04em", lineHeight: 1.1,
+            margin: "0 0 4px", textTransform: "uppercase",
+            background: "linear-gradient(90deg, #b8962e, #f0d060, #e8c84a, #b8962e)",
+            backgroundSize: "200% auto",
+            WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
+            animation: "shimmer 4s linear infinite",
+          }}>Interactive Coverage Map</h1>
+
+          <h2 style={{
+            fontFamily: "'Poppins', sans-serif",
+            fontSize: h2FontSize, fontWeight: 300, color: "#8aabcc",
+            letterSpacing: isMobile ? "0.06em" : "0.12em",
+            textTransform: "uppercase", margin: "0 0 10px",
+          }}>of Active Tower Structural Engineering Projects</h2>
+
+          {showTagline && (
+            <p style={{
+              fontSize: taglineSize, fontFamily: "'Poppins', sans-serif",
+              fontWeight: 400, color: "#5a7a9a", maxWidth: 560,
+              lineHeight: 1.6, margin: "0 0 14px", letterSpacing: "0.02em",
+            }}>
+              Showcasing ATSS's expanding infrastructure footprint through detailed analyses,
+              modification drawings, and engineering deliverables.
+            </p>
+          )}
+
+          {/* Stat pills */}
+          <div style={{ display: "flex", gap: isMobile ? 5 : 8, flexWrap: "wrap", justifyContent: "center" }}>
             {[
               { v: "500+", l: "Deliverables" },
               { v: "26",   l: "States" },
               { v: "20+",  l: "Months Active" },
               { v: "10+",  l: "Service Types" },
             ].map(m => (
-              <div key={m.l} style={S.statPill}>
-                <span style={S.statPillVal}>{m.v}</span>
-                <span style={S.statPillLbl}>{m.l}</span>
+              <div key={m.l} style={{
+                display: "flex", flexDirection: "column", alignItems: "center",
+                background: "rgba(255,255,255,0.04)",
+                border: "1px solid rgba(232,200,74,0.15)",
+                borderRadius: 10, padding: isMobile ? "4px 10px" : "6px 16px",
+                minWidth: isMobile ? 52 : 64,
+              }}>
+                <span style={{ fontSize: isMobile ? 14 : 18, fontWeight: 700, color: "#e0e8f8", lineHeight: 1.1, fontFamily: "'Playfair Display', Georgia, serif" }}>{m.v}</span>
+                <span style={{ fontSize: isMobile ? 7 : 9, color: "#4a6a8a", textTransform: "uppercase", letterSpacing: "0.1em", marginTop: 2, fontFamily: "'Poppins', sans-serif", fontWeight: 600 }}>{m.l}</span>
               </div>
             ))}
           </div>
         </div>
 
-        <div style={S.ruleRow}>
-          <div style={S.ruleLine} />
-          <span style={S.ruleText}>CLICK ANY MARKER TO EXPLORE</span>
-          <div style={S.ruleLine} />
+        {/* Bottom rule */}
+        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          <div style={{ flex: 1, height: 1, background: "linear-gradient(90deg, transparent, rgba(232,200,74,0.4), transparent)" }} />
+          <span style={{ fontSize: 8, fontWeight: 700, letterSpacing: "0.18em", color: "rgba(232,200,74,0.5)", flexShrink: 0, whiteSpace: "nowrap", fontFamily: "'Playfair Display', Georgia, serif" }}>
+            CLICK ANY MARKER TO EXPLORE
+          </span>
+          <div style={{ flex: 1, height: 1, background: "linear-gradient(90deg, transparent, rgba(232,200,74,0.4), transparent)" }} />
         </div>
       </div>
 
-      <div style={S.shell}>
-        <div style={S.mapWrap}>
+      {/* ── Shell ── */}
+      <div style={{
+        display: "flex",
+        width: "100%",
+        flex: isDesktop ? 1 : undefined,
+        flexDirection: shellDirection,
+        minHeight: isDesktop ? 620 : undefined,
+        borderRadius: isMobile ? 10 : 14,
+        overflow: "hidden",
+        border: "1px solid rgba(255,255,255,0.08)",
+        boxShadow: "0 8px 40px rgba(0,0,0,0.5)",
+        background: "#0d1b3e",
+      }}>
+        {/* Map */}
+        <div style={{
+          flex: isDesktop ? "1 1 0" : undefined,
+          position: "relative",
+          minWidth: 0,
+          height: mapHeight ?? (isDesktop ? undefined : 340),
+          width: "100%",
+        }}>
           <MapContainer style={{ width: "100%", height: "100%" }}>
             <SetInitialView />
             <TileLayer {...({
@@ -348,51 +527,9 @@ export default function TowerMap() {
           </MapContainer>
         </div>
 
-        {/* DetailPanel receives no props — it is fully static */}
-        <DetailPanel />
+        {/* Side panel (desktop) or bottom panel (mobile/tablet) */}
+        <DetailPanel layout={isDesktop ? "side" : "bottom"} />
       </div>
     </div>
   );
 }
-
-// ── Styles (unchanged) ──────────────────────────────────────────────────────
-
-const S: Record<string, React.CSSProperties> = {
-  page: {
-    fontFamily: "'Poppins', system-ui, sans-serif",
-    background: "#080f22",
-    minHeight: "100vh",
-    display: "flex",
-    flexDirection: "column",
-    padding: "20px 16px 14px",
-  },
-  headerWrap: { width: "100%", marginBottom: 14 },
-  ruleRow: { display: "flex", alignItems: "center", gap: 10, marginBottom: 10 },
-  ruleLine: { flex: 1, height: 1, background: "linear-gradient(90deg, transparent, rgba(232,200,74,0.4), transparent)" },
-  ruleDiamond: { width: 7, height: 7, background: "#e8c84a", transform: "rotate(45deg)", flexShrink: 0 },
-  ruleText: { fontSize: 9, fontWeight: 700, letterSpacing: "0.18em", color: "rgba(232,200,74,0.5)", flexShrink: 0, whiteSpace: "nowrap" as const, fontFamily: "'Playfair Display', Georgia, serif" },
-  headerCenter: { display: "flex", flexDirection: "column" as const, alignItems: "center", textAlign: "center" as const, marginBottom: 14, padding: "0 16px" },
-  eyebrow: { display: "block", fontSize: 10, fontWeight: 600, letterSpacing: "0.22em", textTransform: "uppercase" as const, color: "#e8c84a", marginBottom: 10, fontFamily: "'Playfair Display', Georgia, serif" },
-  h1: { fontFamily: "'Playfair Display', Georgia, serif", fontSize: 38, fontWeight: 800, color: "#e0e8f8", letterSpacing: "0.04em", lineHeight: 1.1, margin: "0 0 4px", textTransform: "uppercase" as const, background: "linear-gradient(90deg, #b8962e, #f0d060, #e8c84a, #b8962e)", backgroundSize: "200% auto", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", animation: "shimmer 4s linear infinite" },
-  h2: { fontFamily: "'Poppins', sans-serif", fontSize: 16, fontWeight: 300, color: "#8aabcc", letterSpacing: "0.12em", textTransform: "uppercase" as const, margin: "0 0 12px" },
-  tagline: { fontSize: 13, fontFamily: "'Poppins', sans-serif", fontWeight: 400, color: "#5a7a9a", maxWidth: 560, lineHeight: 1.6, margin: "0 0 16px", letterSpacing: "0.02em" },
-  statStrip: { display: "flex", gap: 8, flexWrap: "wrap" as const, justifyContent: "center" },
-  statPill: { display: "flex", flexDirection: "column" as const, alignItems: "center", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(232,200,74,0.15)", borderRadius: 10, padding: "6px 16px", minWidth: 64 },
-  statPillVal: { fontSize: 18, fontWeight: 700, color: "#e0e8f8", lineHeight: 1.1, fontFamily: "'Playfair Display', Georgia, serif" },
-  statPillLbl: { fontSize: 9, color: "#4a6a8a", textTransform: "uppercase" as const, letterSpacing: "0.1em", marginTop: 2, fontFamily: "'Poppins', sans-serif", fontWeight: 600 },
-  shell: { display: "flex", width: "100%", flex: 1, minHeight: 620, borderRadius: 14, overflow: "hidden", border: "1px solid rgba(255,255,255,0.08)", boxShadow: "0 8px 40px rgba(0,0,0,0.5)", background: "#0d1b3e" },
-  mapWrap: { flex: "1 1 0", position: "relative", minWidth: 0 },
-  panel: { flex: "0 0 245px", display: "flex", flexDirection: "column", borderLeft: "1px solid rgba(255,255,255,0.08)", background: "#0d1b3e", overflow: "hidden" },
-  panelHeader: { padding: "14px 16px 10px", borderBottom: "1px solid rgba(255,255,255,0.07)", flexShrink: 0 },
-  panelTitle: { fontSize: 15, fontWeight: 700, color: "#e0e8f8", margin: 0, lineHeight: 1.3, fontFamily: "'Playfair Display', Georgia, serif" },
-  panelSub: { fontSize: 11, color: "#6a8aaa", marginTop: 3, marginBottom: 0, fontFamily: "'Poppins', sans-serif" },
-  sectionLabel: { fontSize: 10, fontWeight: 700, color: "#4a6a8a", textTransform: "uppercase" as const, letterSpacing: "0.1em", margin: "6px 0 5px", fontFamily: "'Playfair Display', Georgia, serif" },
-  row: { display: "flex", alignItems: "center", gap: 7, paddingBottom: 5, borderBottom: "1px solid rgba(255,255,255,0.04)", marginBottom: 4 },
-  swatch: { width: 8, height: 8, borderRadius: 2, flexShrink: 0 },
-  rowLabel: { flex: 1, fontSize: 11, color: "#7a9abb", fontFamily: "'Poppins', sans-serif", fontWeight: 600 },
-  rowCount: { fontWeight: 700, fontSize: 12, color: "#e0e8f8", minWidth: 20, textAlign: "right" as const, fontFamily: "'Playfair Display', Georgia, serif" },
-  statsRow: { display: "flex", borderTop: "1px solid rgba(255,255,255,0.07)", flexShrink: 0 },
-  statCard: { flex: 1, padding: "10px 8px", textAlign: "center" as const, borderRight: "1px solid rgba(255,255,255,0.05)" },
-  statVal: { fontSize: 16, fontWeight: 700, color: "#e0e8f8", margin: 0, fontFamily: "'Playfair Display', Georgia, serif" },
-  statLbl: { fontSize: 10, color: "#4a6a8a", margin: "2px 0 0", fontFamily: "'Poppins', sans-serif", fontWeight: 600 },
-};

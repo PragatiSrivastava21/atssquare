@@ -33,24 +33,25 @@ const StatsCounter = () => {
   const inView = useInView(ref, { once: true, margin: "-100px" });
 
   return (
-    <section ref={ref} className="relative  bg-background pt-40 pb-20"  >
-      <div className="container-px mx-auto">
+    <section ref={ref} className="relative bg-background pt-16 pb-12 sm:pt-24 sm:pb-16 md:pt-32 md:pb-20">
+      <div className="container-px mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
-          className="text-center mb-14"
+          className="text-center mb-8 sm:mb-10 md:mb-14"
         >
           <span className="inline-block rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
             By the numbers
           </span>
-          <h2 className="mt-4 font-display text-3xl font-semibold tracking-tight md:text-4xl text-foreground">
-            Trusted engineering at <span className="text-gradient-gold">scale.</span>
+          <h2 className="mt-3 sm:mt-4 font-display text-2xl font-semibold tracking-tight sm:text-3xl md:text-4xl text-foreground">
+            Trusted engineering at{" "}
+            <span className="text-gradient-gold">scale.</span>
           </h2>
         </motion.div>
 
-        <div className="grid grid-cols-2 gap-6 md:grid-cols-4 md:gap-10">
+        <div className="grid grid-cols-2 gap-4 sm:gap-6 md:grid-cols-4 md:gap-10">
           {stats.map((s, idx) => (
             <CounterCard key={s.label} stat={s} index={idx} inView={inView} />
           ))}
@@ -60,8 +61,20 @@ const StatsCounter = () => {
   );
 };
 
-const CounterCard = ({ stat, index, inView }: { stat: typeof stats[0]; index: number; inView: boolean }) => {
-  const count = useCounter(stat.decimals ? stat.value * 100 : stat.value, 2000, inView);
+const CounterCard = ({
+  stat,
+  index,
+  inView,
+}: {
+  stat: (typeof stats)[0];
+  index: number;
+  inView: boolean;
+}) => {
+  const count = useCounter(
+    stat.decimals ? stat.value * 100 : stat.value,
+    2000,
+    inView
+  );
   const displayValue = stat.decimals
     ? (count / 100).toFixed(stat.decimals)
     : count.toLocaleString();
@@ -72,12 +85,21 @@ const CounterCard = ({ stat, index, inView }: { stat: typeof stats[0]; index: nu
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ duration: 0.6, delay: index * 0.1 }}
-      className="rounded-2xl border border-border bg-card p-6 text-center shadow-[var(--shadow-card)] transition duration-300 hover:-translate-y-1 hover:border-slate-900 hover:bg-slate-950/5 hover:shadow-[0_35px_60px_rgba(15,23,42,0.25)]"
+      className="rounded-2xl border border-border bg-card p-4 sm:p-5 md:p-6 text-center shadow-[var(--shadow-card)] transition duration-300 hover:-translate-y-1 hover:border-slate-900 hover:bg-slate-950/5 hover:shadow-[0_35px_60px_rgba(15,23,42,0.25)]"
     >
-      <div className="font-display text-3xl font-bold text-primary md:text-4xl">
-        {displayValue}{stat.suffix}
+      {/* Value + suffix on one line; shrinks to fit on xs screens */}
+      <div className="font-display font-bold text-primary leading-tight
+                      text-2xl sm:text-3xl md:text-4xl
+                      flex flex-wrap items-baseline justify-center gap-x-0.5">
+        <span>{displayValue}</span>
+        {/* Break long suffixes onto a second line only if needed */}
+        <span className="text-xl sm:text-2xl md:text-3xl whitespace-nowrap">
+          {stat.suffix}
+        </span>
       </div>
-      <div className="mt-2 text-xs text-muted-foreground md:text-sm">{stat.label}</div>
+      <div className="mt-1.5 sm:mt-2 text-xs sm:text-sm text-muted-foreground">
+        {stat.label}
+      </div>
     </motion.div>
   );
 };

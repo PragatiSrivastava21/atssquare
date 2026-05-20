@@ -12,7 +12,7 @@ import { useRef } from "react";
 import aboutHeroBg from "@/assets/about-hero-bg.png";
 
 const values = [
-  { icon: Target, title: "Rigorous Processes", desc: "In Structural Engineering, there’s no margin for error—our rigorous processes ensure every engineering detail is meticulously reviewed for precise and accurate results." },
+  { icon: Target, title: "Rigorous Processes", desc: "In Structural Engineering, there's no margin for error—our rigorous processes ensure every engineering detail is meticulously reviewed for precise and accurate results." },
   { icon: Eye, title: "Transparency", desc: "Clear reporting, honest timelines, and no hidden costs — ever." },
   { icon: Shield, title: "Safety First", desc: "Zero structural failures on record. Safety is non-negotiable." },
   { icon: Users, title: "Partnership", desc: "We embed with your team, not just deliver reports." },
@@ -40,7 +40,6 @@ const valuesGridStyles = `
     border-color: rgba(10,22,64,0.06);
   }
 
-  /* ── Animated border edges (draw clockwise on hover) ── */
   .vg-border-top,
   .vg-border-right,
   .vg-border-bottom,
@@ -52,37 +51,16 @@ const valuesGridStyles = `
     border-radius: 2px;
   }
 
-  /* Top: grows left → right */
-  .vg-border-top {
-    top: 0; left: 0;
-    height: 2px; width: 0%;
-    transition: width 0.22s ease 0s;
-  }
-  /* Right: grows top → bottom */
-  .vg-border-right {
-    top: 0; right: 0;
-    width: 2px; height: 0%;
-    transition: height 0.22s ease 0.22s;
-  }
-  /* Bottom: grows right → left */
-  .vg-border-bottom {
-    bottom: 0; right: 0;
-    height: 2px; width: 0%;
-    transition: width 0.22s ease 0.44s;
-  }
-  /* Left: grows bottom → top */
-  .vg-border-left {
-    bottom: 0; left: 0;
-    width: 2px; height: 0%;
-    transition: height 0.22s ease 0.66s;
-  }
+  .vg-border-top    { top: 0; left: 0; height: 2px; width: 0%; transition: width 0.22s ease 0s; }
+  .vg-border-right  { top: 0; right: 0; width: 2px; height: 0%; transition: height 0.22s ease 0.22s; }
+  .vg-border-bottom { bottom: 0; right: 0; height: 2px; width: 0%; transition: width 0.22s ease 0.44s; }
+  .vg-border-left   { bottom: 0; left: 0; width: 2px; height: 0%; transition: height 0.22s ease 0.66s; }
 
   .vg-card:hover .vg-border-top    { width: 100%; }
   .vg-card:hover .vg-border-right  { height: 100%; }
   .vg-card:hover .vg-border-bottom { width: 100%; }
   .vg-card:hover .vg-border-left   { height: 100%; }
 
-  /* ── Subtle inner glow ── */
   .vg-inner-glow {
     position: absolute;
     inset: 0;
@@ -95,7 +73,6 @@ const valuesGridStyles = `
   }
   .vg-card:hover .vg-inner-glow { opacity: 1; }
 
-  /* ── Icon ── */
   .vg-icon {
     display: grid; place-items: center;
     width: 52px; height: 52px;
@@ -116,7 +93,6 @@ const valuesGridStyles = `
     transform: rotate(-6deg) scale(1.1);
   }
 
-  /* ── Title ── */
   .vg-title {
     font-family: 'Playfair Display', serif;
     font-size: 1.1rem; font-weight: 700;
@@ -125,8 +101,6 @@ const valuesGridStyles = `
     letter-spacing: -0.01em;
     position: relative; z-index: 1;
   }
-
-  /* Gold accent bar slides in after border draw finishes */
   .vg-title::after {
     content: '';
     display: block;
@@ -139,7 +113,6 @@ const valuesGridStyles = `
   }
   .vg-card:hover .vg-title::after { width: 40px; }
 
-  /* ── Description ── */
   .vg-desc {
     margin-top: 0.75rem;
     font-size: 0.875rem;
@@ -150,7 +123,6 @@ const valuesGridStyles = `
   }
   .vg-card:hover .vg-desc { color: #2e3e5c; }
 
-  /* ── Corner gold dot ── */
   .vg-dot {
     position: absolute;
     bottom: 16px; right: 16px;
@@ -177,8 +149,12 @@ const About = () => {
       <style>{valuesGridStyles}</style>
       <Navbar />
 
-      {/* Hero */}
-      <section ref={heroRef} className="relative min-h-screen flex items-center overflow-hidden">
+      {/* ── Hero ── */}
+      <section
+        ref={heroRef}
+        className="relative min-h-screen flex items-center overflow-hidden"
+      >
+        {/* Parallax background */}
         <motion.div className="absolute inset-0" style={{ y: bgY }}>
           <img
             src={aboutHeroBg}
@@ -188,55 +164,79 @@ const About = () => {
             className="h-full w-full object-cover scale-110 opacity-80"
           />
         </motion.div>
+
+        {/* Overlays */}
         <div className="absolute inset-0 bg-gradient-to-b from-[hsl(217,67%,7%)/0.7] via-[hsl(217,67%,12%)/0.6] to-background" />
         <div className="absolute inset-0 bg-gradient-to-r from-[hsl(217,67%,7%)/0.5] via-transparent to-transparent" />
 
-       <div className="relative z-10 w-full pt-5 pb-20 px-6 md:px-16 lg:px-24">
-  <motion.div
-    initial={{ opacity: 0, y: 30 }}
-    animate={{ opacity: 1, y: 0 }}
-    transition={{ duration: 0.7 }}
-    className="max-w-3xl text-left"
-  >
+        {/* Hero content */}
+        <div className="relative z-10 w-full pt-24 pb-36 px-5 sm:px-8 md:px-16 lg:px-24">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7 }}
+            className="max-w-3xl text-left"
+          >
             <span className="inline-block rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
               About ATSS
             </span>
-            <h1 className="mt-5 font-display text-4xl font-semibold text-[#091a3d] md:text-6xl">
-              <span className="whitespace-nowrap">Engineering infrastructure that{" "}</span><br />
+
+            {/* Responsive heading — no forced whitespace-nowrap on mobile */}
+            <h1 className="mt-5 font-display font-semibold text-[#091a3d] text-3xl sm:text-4xl md:text-5xl lg:text-6xl leading-tight">
+              Engineering infrastructure that{" "}
               <span className="relative inline-block">
                 <span className="text-yellow-500">Stands</span>
-                <svg className="absolute -bottom-2 left-0 w-full" viewBox="0 0 200 12" fill="none">
-                  <path d="M2 9 Q 50 2, 100 6 T 198 4" stroke="hsl(44, 65%, 52%)" strokeWidth="2.5" strokeLinecap="round" />
+                <svg
+                  className="absolute -bottom-1 left-0 w-full"
+                  viewBox="0 0 200 12"
+                  fill="none"
+                  aria-hidden="true"
+                >
+                  <path
+                    d="M2 9 Q 50 2, 100 6 T 198 4"
+                    stroke="hsl(44, 65%, 52%)"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                  />
                 </svg>
               </span>{" "}
-              <span className="text-[#091a3d] decoration-[#d4a017] decoration-2">
-                the test of time.
-              </span>
+              <span className="text-[#091a3d]">the test of time.</span>
             </h1>
-            <p className="mt-6 text-lg text-gray-700 leading-relaxed max-w-2xl">
-              At ATSS, we are dedicated to advancing the reliability and performance of wireless infrastructure
-              through cutting-edge engineering solutions. With a focus on innovation, precision, and client satisfaction,
-              we provide comprehensive services designed to meet the unique challenges of the wireless industry.
+
+            <p className="mt-6 text-base sm:text-lg text-gray-700 leading-relaxed max-w-2xl">
+              At ATSS, we are dedicated to advancing the reliability and
+              performance of wireless infrastructure through cutting-edge
+              engineering solutions. With a focus on innovation, precision, and
+              client satisfaction, we provide comprehensive services designed to
+              meet the unique challenges of the wireless industry.
             </p>
           </motion.div>
         </div>
 
+        {/* Wave dividers */}
         <div
-          className="absolute bottom-0 left-0 w-full h-32 bg-gradient-to-r from-slate-900 via-blue-700 to-blue-500"
-          style={{ clipPath: "polygon(0 40%, 25% 70%, 55% 45%, 75% 55%, 100% 40%, 100% 100%, 0% 100%)" }}
+          className="absolute bottom-0 left-0 w-full h-24 sm:h-32 bg-gradient-to-r from-slate-900 via-blue-700 to-blue-500"
+          style={{
+            clipPath:
+              "polygon(0 40%, 25% 70%, 55% 45%, 75% 55%, 100% 40%, 100% 100%, 0% 100%)",
+          }}
         />
         <div
-          className="absolute bottom-0 left-0 w-full h-28 bg-white"
-          style={{ clipPath: "polygon(0 60%, 25% 80%, 55% 55%, 75% 65%, 100% 50%, 100% 100%, 0% 100%)" }}
+          className="absolute bottom-0 left-0 w-full h-20 sm:h-28 bg-white"
+          style={{
+            clipPath:
+              "polygon(0 60%, 25% 80%, 55% 55%, 75% 65%, 100% 50%, 100% 100%, 0% 100%)",
+          }}
         />
       </section>
 
-      {/* Vision & Mission */}
+      {/* ── Vision & Mission ── */}
       <VisionMission />
 
-      {/* Values */}
-      <section className="pb-20 container-px mx-auto">
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+      {/* ── Values grid ── */}
+      <section className="pb-16 sm:pb-20 px-5 sm:px-8 md:px-12 lg:px-16 xl:px-24 mx-auto max-w-screen-xl">
+        {/* 1 col → 2 col (sm) → 4 col (lg) */}
+        <div className="grid gap-5 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
           {values.map((v, i) => {
             const Icon = v.icon;
             return (
@@ -248,23 +248,15 @@ const About = () => {
                 transition={{ duration: 0.6, delay: i * 0.1 }}
                 className="vg-card"
               >
-                {/* Border draw edges — fire clockwise on hover */}
                 <span className="vg-border-top" />
                 <span className="vg-border-right" />
                 <span className="vg-border-bottom" />
                 <span className="vg-border-left" />
-
-                {/* Inner glow */}
                 <div className="vg-inner-glow" />
-
-                {/* Corner dot */}
                 <div className="vg-dot" />
-
-                {/* Icon */}
                 <div className="vg-icon">
                   <Icon size={22} />
                 </div>
-
                 <h3 className="vg-title">{v.title}</h3>
                 <p className="vg-desc">{v.desc}</p>
               </motion.div>
