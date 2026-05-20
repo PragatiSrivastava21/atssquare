@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { Mail, Phone, MapPin } from "lucide-react";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import emailjs from "@emailjs/browser";
 
@@ -10,22 +10,51 @@ const ContactForm = () => {
   const [error, setError] = useState("");
   const formRef = useRef<HTMLFormElement>(null);
 
+  // Initialize EmailJS on component mount
+  useEffect(() => {
+    const publicKey = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
+    if (publicKey) {
+      emailjs.init(publicKey);
+      console.log("EmailJS initialized successfully");
+    } else {
+      console.error("EmailJS public key not found in environment variables");
+    }
+  }, []);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError("");
 
+    // Validate environment variables
+    const serviceId = import.meta.env.VITE_EMAILJS_SERVICE_ID;
+    const templateId = import.meta.env.VITE_EMAILJS_TEMPLATE_ID;
+    const publicKey = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
+
+    console.log("Attempting to send email with:", { serviceId: serviceId ? "✓" : "✗", templateId: templateId ? "✓" : "✗", publicKey: publicKey ? "✓" : "✗" });
+
+    if (!serviceId || !templateId || !publicKey) {
+      console.error("Missing EmailJS environment variables", { serviceId, templateId, publicKey });
+      setError("Email service is not configured. Please try again later.");
+      setLoading(false);
+      return;
+    }
+
     try {
-      await emailjs.sendForm(
-        import.meta.env.VITE_EMAILJS_SERVICE_ID,
-        import.meta.env.VITE_EMAILJS_TEMPLATE_ID,
-        formRef.current!,
-        import.meta.env.VITE_EMAILJS_PUBLIC_KEY
-      );
+      const result = await emailjs.sendForm(serviceId, templateId, formRef.current!, publicKey);
+      console.log("Email sent successfully:", result);
       setSubmitted(true);
-    } catch (err) {
-      console.error(err);
-      setError("Something went wrong. Please try again.");
+      if (formRef.current) {
+        formRef.current.reset();
+      }
+    } catch (err: any) {
+      console.error("EmailJS Error Details:", {
+        message: err.message,
+        status: err.status,
+        text: err.text,
+        error: err,
+      });
+      setError(`Error: ${err.message || "Failed to send message. Please try again or contact support directly."}`);
     } finally {
       setLoading(false);
     }

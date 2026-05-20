@@ -4,31 +4,40 @@ import Navbar from "@/components/site/Navbar";
 import Footer from "@/components/site/Footer";
 import { motion } from "framer-motion";
 import { Mail, Phone, MapPin, ArrowUpRight } from "lucide-react";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-
-const CONTACT_API_URL = import.meta.env.VITE_CONTACT_API_URL || "/api/send-email";
+import emailjs from "@emailjs/browser";
 
 type Status = "idle" | "sending" | "error";
 
 interface FormData {
-  from_name: string;
+  name: string;
   company: string;
-  from_email: string;
+  email: string;
   message: string;
 }
 
 const Contact = () => {
   useLenis();
 
+  const formRef = useRef<HTMLFormElement>(null);
   const [submitted, setSubmitted] = useState(false);
   const [status, setStatus] = useState<Status>("idle");
   const [form, setForm] = useState<FormData>({
-    from_name: "",
+    name: "",
     company: "",
-    from_email: "",
+    email: "",
     message: "",
   });
+
+  // Initialize EmailJS on component mount
+  useEffect(() => {
+    const publicKey = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
+    if (publicKey) {
+      emailjs.init(publicKey);
+      console.log("EmailJS initialized");
+    }
+  }, []);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -40,27 +49,30 @@ const Contact = () => {
     e.preventDefault();
     setStatus("sending");
 
+    const serviceId = import.meta.env.VITE_EMAILJS_SERVICE_ID;
+    const templateId = import.meta.env.VITE_EMAILJS_TEMPLATE_ID;
+    const publicKey = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
+
+    if (!serviceId || !templateId || !publicKey) {
+      console.error("Missing EmailJS credentials");
+      setStatus("error");
+      return;
+    }
+
     try {
-      const response = await fetch(CONTACT_API_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: form.from_name,
-          company: form.company,
-          email: form.from_email,
-          message: form.message,
-        }),
-      });
+      const templateParams = {
+        name: form.name,
+        company: form.company,
+        email: form.email,
+        message: form.message,
+      };
 
-      if (!response.ok) {
-        const payload = await response.json().catch(() => ({}));
-        throw new Error(payload?.error || "Failed to send message");
-      }
-
+      await emailjs.send(serviceId, templateId, templateParams, publicKey);
       setStatus("idle");
       setSubmitted(true);
-    } catch (err) {
-      console.error(err);
+      setForm({ name: "", company: "", email: "", message: "" });
+    } catch (err: any) {
+      console.error("EmailJS Error:", err);
       setStatus("error");
     }
   };
@@ -113,8 +125,8 @@ const Contact = () => {
                     </label>
                     <input
                       required
-                      name="from_name"
-                      value={form.from_name}
+                      name="name"
+                      value={form.name}
                       onChange={handleChange}
                       className="mt-1.5 w-full rounded-xl border border-border bg-background px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
                       placeholder="Your name"
@@ -141,9 +153,9 @@ const Contact = () => {
                   </label>
                   <input
                     required
-                    name="from_email"
+                    name="email"
                     type="email"
-                    value={form.from_email}
+                    value={form.email}
                     onChange={handleChange}
                     className="mt-1.5 w-full rounded-xl border border-border bg-background px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
                     placeholder="you@company.com"
