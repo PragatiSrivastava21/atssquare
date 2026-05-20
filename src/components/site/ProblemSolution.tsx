@@ -192,20 +192,16 @@ const renderCustomLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent
 
 function DetailPanel({ layout }: { layout: "side" | "bottom" }) {
   const isBottom = layout === "bottom";
-  const pieSize = isBottom ? 160 : 210;
-  const pieInner = isBottom ? 40 : 55;
-  const pieOuter = isBottom ? 72 : 95;
 
   const panelStyle: React.CSSProperties = isBottom
     ? {
         width: "100%",
         borderTop: "1px solid rgba(255,255,255,0.08)",
         background: "#0d1b3e",
-        overflow: "hidden",
         flexShrink: 0,
       }
     : {
-        flex: "0 0 245px",
+       flex: "0 0 320px",
         display: "flex",
         flexDirection: "column",
         borderLeft: "1px solid rgba(255,255,255,0.08)",
@@ -217,60 +213,41 @@ function DetailPanel({ layout }: { layout: "side" | "bottom" }) {
     <div style={panelStyle}>
       {/* Header */}
       <div style={{
-        padding: isBottom ? "10px 16px 8px" : "14px 16px 10px",
+        padding: "10px 16px 8px",
         borderBottom: "1px solid rgba(255,255,255,0.07)",
         flexShrink: 0,
-        display: isBottom ? "flex" : "block",
-        alignItems: isBottom ? "center" : undefined,
-        justifyContent: isBottom ? "space-between" : undefined,
-        gap: isBottom ? 12 : undefined,
       }}>
-        <div>
-          <p style={{ fontSize: isBottom ? 13 : 15, fontWeight: 700, color: "#e0e8f8", margin: 0, lineHeight: 1.3, fontFamily: "'Playfair Display', Georgia, serif" }}>
-            Portfolio Overview
-          </p>
-          <p style={{ fontSize: 11, color: "#6a8aaa", marginTop: 2, marginBottom: 0, fontFamily: "'Poppins', sans-serif" }}>
-            500+ deliverables · 26 states · 15+ months
-          </p>
-        </div>
-        {/* Inline stats for bottom layout */}
-        {isBottom && (
-          <div style={{ display: "flex", gap: 8, flexShrink: 0 }}>
-            {[{ l: "States", v: "26" }, { l: "Months", v: "15+" }, { l: "Total", v: "500+" }].map(m => (
-              <div key={m.l} style={{ textAlign: "center", padding: "4px 10px", background: "rgba(255,255,255,0.04)", borderRadius: 8, border: "1px solid rgba(255,255,255,0.06)" }}>
-                <p style={{ fontSize: 14, fontWeight: 700, color: "#e0e8f8", margin: 0, fontFamily: "'Playfair Display', Georgia, serif" }}>{m.v}</p>
-                <p style={{ fontSize: 9, color: "#4a6a8a", margin: 0, fontFamily: "'Poppins', sans-serif", fontWeight: 600 }}>{m.l}</p>
-              </div>
-            ))}
-          </div>
-        )}
+        <p style={{ fontSize: isBottom ? 13 : 15, fontWeight: 700, color: "#e0e8f8", margin: 0, lineHeight: 1.3, fontFamily: "'Playfair Display', Georgia, serif" }}>
+          Portfolio Overview
+        </p>
+        <p style={{ fontSize: 11, color: "#6a8aaa", marginTop: 2, marginBottom: 0, fontFamily: "'Poppins', sans-serif" }}>
+          500+ deliverables · 26 states · 15+ months
+        </p>
       </div>
 
-      {/* Body: horizontal on bottom, vertical on side */}
+      {/* Body */}
       <div style={{
-        display: isBottom ? "flex" : "flex",
-        flexDirection: isBottom ? "row" : "column",
-        overflowX: isBottom ? "auto" : undefined,
-        overflowY: isBottom ? "hidden" : undefined,
+        display: "flex",
+        flexDirection: isBottom ? "column" : "column",
         flex: isBottom ? undefined : 1,
         minHeight: 0,
-        alignItems: isBottom ? "flex-start" : undefined,
+        overflowY: isBottom ? undefined : "auto",
       }}>
-        {/* Pie chart */}
+        {/* Pie chart — centered, never clipped */}
         <div style={{
           display: "flex",
           justifyContent: "center",
           alignItems: "center",
-          padding: isBottom ? "10px 8px 10px 16px" : "14px 8px 4px",
+          padding: "12px 8px 4px",
           flexShrink: 0,
         }}>
-          <PieChart width={pieSize} height={pieSize}>
+          <PieChart width={200} height={200}>
             <Pie
               data={SUMMARY_PIE}
               dataKey="value"
               nameKey="name"
-              cx={pieSize / 2} cy={pieSize / 2}
-              innerRadius={pieInner} outerRadius={pieOuter}
+              cx={100} cy={100}
+              innerRadius={48} outerRadius={88}
               animationBegin={0} animationDuration={600}
               isAnimationActive={true}
               labelLine={false}
@@ -293,40 +270,48 @@ function DetailPanel({ layout }: { layout: "side" | "bottom" }) {
           </PieChart>
         </div>
 
-        {/* Legend list */}
+        {/* Stats row — only on bottom layout */}
+        {isBottom && (
+          <div style={{ display: "flex", justifyContent: "center", gap: 8, padding: "0 16px 10px" }}>
+            {[{ l: "States", v: "26" }, { l: "Months", v: "15+" }, { l: "Total", v: "500+" }].map(m => (
+              <div key={m.l} style={{ textAlign: "center", padding: "4px 12px", background: "rgba(255,255,255,0.04)", borderRadius: 8, border: "1px solid rgba(255,255,255,0.06)" }}>
+                <p style={{ fontSize: 14, fontWeight: 700, color: "#e0e8f8", margin: 0, fontFamily: "'Playfair Display', Georgia, serif" }}>{m.v}</p>
+                <p style={{ fontSize: 9, color: "#4a6a8a", margin: 0, fontFamily: "'Poppins', sans-serif", fontWeight: 600 }}>{m.l}</p>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Legend */}
         <div style={{
-          padding: isBottom ? "10px 16px 10px 4px" : "0 14px 10px",
+          padding: "0 14px 12px",
           overflowY: isBottom ? undefined : "auto",
-          overflowX: isBottom ? undefined : undefined,
           flex: isBottom ? undefined : 1,
-          minWidth: isBottom ? 320 : undefined,
-          display: isBottom ? "flex" : "block",
-          flexDirection: isBottom ? "column" : undefined,
-          justifyContent: isBottom ? "center" : undefined,
         }}>
           <p style={{
             fontSize: 10, fontWeight: 700, color: "#4a6a8a",
             textTransform: "uppercase" as const, letterSpacing: "0.1em",
-            margin: isBottom ? "0 0 5px" : "6px 0 5px",
+            margin: "4px 0 6px",
             fontFamily: "'Playfair Display', Georgia, serif"
           }}>Service Totals</p>
-          <div style={isBottom
-            ? { display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "3px 16px" }
-            : {}
-          }>
+          <div style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(2, 1fr)",
+            gap: "3px 12px",
+          }}>
             {SUMMARY_PIE.map((d, i) => (
               <div key={i} style={{
-                display: "flex", alignItems: "center", gap: 7,
+                display: "flex", alignItems: "center", gap: 6,
                 paddingBottom: 5,
                 borderBottom: "1px solid rgba(255,255,255,0.04)",
-                marginBottom: 4,
+                marginBottom: 3,
               }}>
                 <span style={{ width: 8, height: 8, borderRadius: 2, flexShrink: 0, background: d.color }} />
-                <span style={{ flex: 1, fontSize: 11, color: "#7a9abb", fontFamily: "'Poppins', sans-serif", fontWeight: 600 }}>{d.name}</span>
+                <span style={{ flex: 1, fontSize: 10, color: "#7a9abb", fontFamily: "'Poppins', sans-serif", fontWeight: 600, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{d.name}</span>
                 <span style={{
-                  fontWeight: 800, fontSize: 12, color: d.color,
+                  fontWeight: 800, fontSize: 11, color: d.color,
                   background: `${d.color}22`,
-                  borderRadius: 6, padding: "1px 7px",
+                  borderRadius: 6, padding: "1px 5px", flexShrink: 0,
                   fontFamily: "'Playfair Display', Georgia, serif"
                 }}>
                   {Math.round(d.value / TOTAL_SUMMARY * 100)}%
@@ -337,7 +322,7 @@ function DetailPanel({ layout }: { layout: "side" | "bottom" }) {
         </div>
       </div>
 
-      {/* Stats footer — only on side panel */}
+      {/* Stats footer — side panel only */}
       {!isBottom && (
         <div style={{ display: "flex", borderTop: "1px solid rgba(255,255,255,0.07)", flexShrink: 0 }}>
           {[{ l: "States", v: "26" }, { l: "Months", v: "15+" }, { l: "Total", v: "500+" }].map(m => (

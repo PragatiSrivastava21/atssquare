@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Activity, Layers, Building2, Antenna, Wind, Settings, ArrowRight } from "lucide-react";
+import { Activity, Layers, Antenna, Wind, Settings, ArrowRight } from "lucide-react";
 
 const services = [
   {
@@ -101,7 +101,6 @@ const styles = `
     border-color: rgba(10,22,64,0.07);
   }
 
-  /* Animated border edges */
   .wwd-border-top, .wwd-border-right,
   .wwd-border-bottom, .wwd-border-left {
     position: absolute;
@@ -243,36 +242,28 @@ const styles = `
     inset: -5px;
   }
 
-  /* ── Second row centering ── */
+  /* ── Second row ── */
   .wwd-second-row {
-    display: flex;
-    justify-content: center;
-    gap: 1.25rem; /* matches gap-5 = 20px */
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
   }
 
-  /* On mobile & tablet the second row fills full width */
-  @media (max-width: 1023px) {
-    .wwd-second-row-card {
-      width: 100%;
-    }
-  }
-
-  /* On desktop: each second-row card matches exactly 1/3 of the grid width */
   @media (min-width: 1024px) {
+    .wwd-second-row {
+      display: flex;
+      justify-content: center;
+      gap: 1.25rem;
+      flex-wrap: wrap;
+    }
     .wwd-second-row-card {
-      /* 
-        Grid has 3 columns with gap-5 (20px).
-        Card width = (100% - 2*20px) / 3
-        Use calc to mirror the CSS grid column sizing.
-      */
       width: calc((100% - 2 * 1.25rem) / 3);
       max-width: calc((100% - 2 * 1.25rem) / 3);
     }
   }
 `;
 
-const ServiceCard = ({ service, index }) => {
+const ServiceCard = ({ service, index }: { service: typeof services[0]; index: number }) => {
   const Icon = service.icon;
   return (
     <motion.div
@@ -322,14 +313,14 @@ const WhatWeDoSection = () => {
         </p>
       </motion.div>
 
-      {/* Row 1 — CSS Grid: 1 col → 2 col → 3 col */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+      {/* Row 1 — 1 col on mobile/tablet, 3 col on desktop */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
         {firstRow.map((s, i) => (
           <ServiceCard key={s.title} service={s} index={i} />
         ))}
       </div>
 
-      {/* Row 2 — Flexbox centered; cards match grid column width on desktop */}
+      {/* Row 2 — stacked on mobile/tablet, centered flex on desktop */}
       <div className="wwd-second-row mt-5">
         {secondRow.map((s, i) => (
           <div key={s.title} className="wwd-second-row-card">
