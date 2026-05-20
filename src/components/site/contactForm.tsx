@@ -1,10 +1,35 @@
 import { motion } from "framer-motion";
 import { Mail, Phone, MapPin } from "lucide-react";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
+import emailjs from "@emailjs/browser";
 
 const ContactForm = () => {
   const [submitted, setSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const formRef = useRef<HTMLFormElement>(null);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setError("");
+
+    try {
+      await emailjs.sendForm(
+        import.meta.env.VITE_EMAILJS_SERVICE_ID,
+        import.meta.env.VITE_EMAILJS_TEMPLATE_ID,
+        formRef.current!,
+        import.meta.env.VITE_EMAILJS_PUBLIC_KEY
+      );
+      setSubmitted(true);
+    } catch (err) {
+      console.error(err);
+      setError("Something went wrong. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <section className="pt-20 pb-20 container-px mx-auto">
@@ -40,17 +65,12 @@ const ContactForm = () => {
               <p className="mt-2 text-muted-foreground">We'll be in touch within 24 hours.</p>
             </div>
           ) : (
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                setSubmitted(true);
-              }}
-              className="space-y-5"
-            >
+            <form ref={formRef} onSubmit={handleSubmit} className="space-y-5">
               <div className="grid gap-5 sm:grid-cols-2">
                 <div>
                   <label className="text-sm font-medium text-foreground">Name</label>
                   <input
+                    name="name"
                     required
                     className="mt-1.5 w-full rounded-xl border border-border bg-background px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
                     placeholder="Your name"
@@ -59,6 +79,7 @@ const ContactForm = () => {
                 <div>
                   <label className="text-sm font-medium text-foreground">Company</label>
                   <input
+                    name="company"
                     className="mt-1.5 w-full rounded-xl border border-border bg-background px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
                     placeholder="Company name"
                   />
@@ -67,6 +88,7 @@ const ContactForm = () => {
               <div>
                 <label className="text-sm font-medium text-foreground">Email</label>
                 <input
+                  name="email"
                   required
                   type="email"
                   className="mt-1.5 w-full rounded-xl border border-border bg-background px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
@@ -76,15 +98,23 @@ const ContactForm = () => {
               <div>
                 <label className="text-sm font-medium text-foreground">Message</label>
                 <textarea
+                  name="message"
                   required
                   rows={5}
                   className="mt-1.5 w-full rounded-xl border border-border bg-background px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 resize-none"
                   placeholder="Tell us about your project..."
                 />
               </div>
-              <Button type="submit" className="w-full rounded-xl py-3">
-                Send Message
+              <Button
+                type="submit"
+                disabled={loading}
+                className="w-full rounded-xl py-3"
+              >
+                {loading ? "Sending..." : "Send Message"}
               </Button>
+              {error && (
+                <p className="text-sm text-red-500 text-center">{error}</p>
+              )}
             </form>
           )}
         </motion.div>
