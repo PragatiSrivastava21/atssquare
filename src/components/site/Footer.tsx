@@ -43,7 +43,7 @@ const Footer = () => {
         <div className="space-y-3">
           <Link to="/" className="flex items-center gap-2.5">
             <img
-              src="/ats2-logo.png"
+              src="/ats2-logo.jpeg"
               alt="ATS²"
               className="h-10 w-auto object-contain"
             />

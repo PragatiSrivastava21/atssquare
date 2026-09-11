@@ -107,7 +107,7 @@ const Navbar = () => {
     >
       <nav className="container-px mx-auto flex h-16 items-center justify-between md:h-20">
         <Link to="/" className="group flex items-center gap-2.5">
-          <img src="/ats2-logo.png" alt="ATS² Logo" className="h-12 md:h-16 object-contain" />
+          <img src="/ats2-logo.jpeg" alt="ATS² Logo" className="h-12 md:h-16 object-contain" />
           <div className="hidden md:flex flex-col">
             <h1
               style={{
