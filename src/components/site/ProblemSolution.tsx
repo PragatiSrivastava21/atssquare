@@ -4,25 +4,18 @@ import React, { useState, useEffect, useRef, useMemo } from "react";
  * ATSS — Service Capability Radar
  * React + Tailwind port of the original static HTML/SVG/vanilla-JS component.
  *
- * Notes on the port:
- * - All animation/interaction logic (draw-in ease, hover/click highlight) is
- *   reproduced with hooks instead of direct DOM manipulation.
- * - Colors, spacing and the corner-bracket panel treatment are reproduced with
- *   Tailwind's arbitrary-value syntax since the palette is custom (not part of
- *   Tailwind's default theme).
- * - Fonts (Inter / Fraunces) are pulled in via an @import in a <style> tag so
- *   this file works as a drop-in, dependency-free component. If your project
- *   already loads these fonts globally (e.g. in index.html or a layout file),
- *   feel free to delete the <style> block below.
- * - Expanded from the original 5 discipline-level axes to the 13 individual
- *   service lines that roll up into them. Each service's share is an estimate
- *   split out of its parent discipline's original percentage — swap in real
- *   figures when available.
+ * DATA SOURCE: recalculated from the "Project Submission" tracker (307 total
+ * tracked entries). Each service's percentage is its actual share of all
+ * rows in the tracker, not an estimate. "New Tower Drawing" was dropped
+ * because it has zero occurrences in the source data. Stats (project count,
+ * states served, clients) were derived the same way — states from the
+ * 2-letter prefixes on project IDs, clients from the "Company Name" column.
  */
 
 type ServiceDatum = {
   name: string;
   pct: number;
+  count: number;
   desc: string;
 };
 
@@ -31,32 +24,30 @@ type StatDatum = {
   label: string;
 };
 
+const TOTAL_PROJECTS = 307;
+
 const DATA: ServiceDatum[] = [
-  { name: "Failing SA", pct: 9, desc: "SA reviews that identify a tower as structurally deficient." },
-  { name: "Passing SA", pct: 14, desc: "SA reviews confirming a tower meets its rated capacity." },
-  { name: "SA Review", pct: 18, desc: "Comprehensive structural analysis across all governing load cases." },
-  { name: "Mod SA", pct: 9, desc: "Structural analysis run against a proposed modification." },
-  { name: "Mod Drawing", pct: 6, desc: "Reinforcement and modification drawing packages." },
-  { name: "Rerun SA", pct: 6, desc: "Updated SA following equipment, loading or code changes." },
-  { name: "Preliminary Design", pct: 4, desc: "Early-stage design packages for new build and co-location." },
-  { name: "New Design", pct: 2, desc: "Full engineering design packages for new tower structures." },
-  { name: "New Tower Drawing", pct: 2, desc: "Construction drawing sets for new tower builds." },
-  { name: "Closeout Report", pct: 6, desc: "Post-construction closeout documentation and verification." },
-  { name: "Tower Inspection Report", pct: 8, desc: "Field inspection and condition assessment reporting." },
-  { name: "Mount Analysis", pct: 9, desc: "Structural analysis of antenna mount systems." },
-  { name: "Fatigue Analysis", pct: 7, desc: "Fatigue and fitness-for-service evaluation under cyclic loads." },
+  { name: "Structural Analysis", pct: 64.2, count: 197, desc: "Passing SA, Mod SA, Failing SA and Rerun SA combined — the core SA workload across new reviews, modifications, and re-analysis (159 Passing, 17 Mod, 16 Failing, 5 Rerun)." },
+  { name: "SA Review", pct: 20.8, count: 64, desc: "Comprehensive structural analysis review across all governing load cases." },
+  { name: "Mod Drawing", pct: 5.5, count: 17, desc: "Reinforcement and modification drawing packages." },
+  { name: "Preliminary Design", pct: 4.2, count: 13, desc: "Early-stage design packages for new build and co-location, mostly Almvoy sites." },
+  { name: "Closeout Report", pct: 1.6, count: 5, desc: "Post-construction closeout documentation and verification." },
+  { name: "Tower Inspection Report", pct: 1.6, count: 5, desc: "Field inspection and condition assessment reporting." },
+  { name: "Mount Analysis", pct: 1.3, count: 4, desc: "Structural analysis of antenna mount systems." },
+  { name: "New Design", pct: 0.3, count: 1, desc: "Full engineering design package for a new tower structure." },
+  { name: "Fatigue Analysis", pct: 0.3, count: 1, desc: "Fatigue and fitness-for-service evaluation under cyclic loads (natural wind and galloping)." },
 ];
 
 const STATS: StatDatum[] = [
-  { num: "13", label: "SERVICE TYPES" },
-  { num: "26", label: "STATES SERVED" },
-  { num: "15+", label: "YEARS COMBINED EXPERIENCE" },
+  { num: String(TOTAL_PROJECTS), label: "PROJECTS TRACKED" },
+  { num: "20", label: "STATES SERVED" },
+  { num: "5", label: "CLIENTS" },
 ];
 
 const CX = 280;
 const CY = 280;
 const MAX_R = 190;
-const MAX_VAL = 20; // scale ceiling
+const MAX_VAL = 70; // scale ceiling — widened so combined Structural Analysis (64.2%) still fits inside the ring
 const N = DATA.length;
 const LABEL_RATIO = 1.2;
 
@@ -67,7 +58,7 @@ function pointAt(i: number, valueRatio: number): [number, number] {
 }
 
 // Break a label into at most two lines, split near the midpoint on a word
-// boundary, so long service names don't overrun their slot on a 13-axis chart.
+// boundary, so long service names don't overrun their slot on a 12-axis chart.
 function splitLabel(name: string): string[] {
   const words = name.split(" ");
   if (words.length <= 1) return [name];
@@ -162,7 +153,7 @@ export default function ServiceCapabilityRadar() {
         {/* Eyebrow */}
         <div className="mb-[18px] flex items-center gap-[10px] text-xs font-semibold tracking-[0.14em] text-[#d6ab5c]">
           <span className="inline-block h-px w-5 bg-[rgba(214,171,92,0.55)]" />
-          SERVICE DEPTH
+          SERVICE DEPTH — ACTUAL PROJECT DATA
         </div>
 
         {/* Heading */}
@@ -177,10 +168,11 @@ export default function ServiceCapabilityRadar() {
           capability
         </h1>
 
-        <p className="mb-14 max-w-[520px] text-[15.5px] leading-[1.65] text-[#8996ab]">
-          Rather than counting projects, this shows where ATSS&rsquo;s engineering
-          hours actually go — across analysis, design, inspection and reporting
-          disciplines built for tower infrastructure.
+        <p className="mb-14 max-w-[560px] text-[15.5px] leading-[1.65] text-[#8996ab]">
+          Based on {TOTAL_PROJECTS} tracked project entries, this shows where ATSS&rsquo;s
+          engineering hours actually go — across analysis, design, inspection
+          and reporting disciplines built for tower infrastructure. Passing SA
+          and SA Review together account for roughly 73% of all work.
         </p>
 
         {/* Panel */}
@@ -278,7 +270,7 @@ export default function ServiceCapabilityRadar() {
                   })}
                 </svg>
               <div className="mt-[22px] text-center text-[10.5px] font-semibold tracking-[0.14em] text-[#5c6980]">
-                RELATIVE EXPERTISE ACROSS CORE SERVICE LINES
+                RELATIVE SHARE ACROSS CORE SERVICE LINES ({TOTAL_PROJECTS} TRACKED PROJECTS)
               </div>
             </div>
 
@@ -330,11 +322,11 @@ export default function ServiceCapabilityRadar() {
                           className="radar-desc overflow-hidden text-[12.5px] leading-[1.5] text-[#8996ab]"
                           style={
                             isActive
-                              ? { maxHeight: 60, opacity: 1, marginTop: 6 }
+                              ? { maxHeight: 72, opacity: 1, marginTop: 6 }
                               : { maxHeight: 0, opacity: 0 }
                           }
                         >
-                          {d.desc}
+                          {d.desc} ({d.count} of {TOTAL_PROJECTS} entries)
                         </div>
                       </div>
                     </div>
