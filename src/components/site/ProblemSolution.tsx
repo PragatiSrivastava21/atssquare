@@ -28,6 +28,7 @@ const TOTAL_PROJECTS = 307;
 
 const DATA: ServiceDatum[] = [
   { name: "Structural Analysis", pct: 64.2, count: 197, desc: "Passing SA, Mod SA, Failing SA and Rerun SA combined — the core SA workload across new reviews, modifications, and re-analysis (159 Passing, 17 Mod, 16 Failing, 5 Rerun)." },
+  { name: "Fatigue Analysis", pct: 0.3, count: 1, desc: "Fatigue and fitness-for-service evaluation under cyclic loads (natural wind and galloping)." },
   { name: "SA Review", pct: 20.8, count: 64, desc: "Comprehensive structural analysis review across all governing load cases." },
   { name: "Mod Drawing", pct: 5.5, count: 17, desc: "Reinforcement and modification drawing packages." },
   { name: "Preliminary Design", pct: 4.2, count: 13, desc: "Early-stage design packages for new build and co-location, mostly Almvoy sites." },
@@ -35,7 +36,7 @@ const DATA: ServiceDatum[] = [
   { name: "Tower Inspection Report", pct: 1.6, count: 5, desc: "Field inspection and condition assessment reporting." },
   { name: "Mount Analysis", pct: 1.3, count: 4, desc: "Structural analysis of antenna mount systems." },
   { name: "New Design", pct: 0.3, count: 1, desc: "Full engineering design package for a new tower structure." },
-  { name: "Fatigue Analysis", pct: 0.3, count: 1, desc: "Fatigue and fitness-for-service evaluation under cyclic loads (natural wind and galloping)." },
+ 
 ];
 
 const STATS: StatDatum[] = [

@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { User } from "lucide-react";
+import niteshPhoto from "@/assets/nitesh-ahuja.jpeg";
 
 const CEOSection = () => {
   return (
@@ -47,12 +47,11 @@ const CEOSection = () => {
           className="relative flex justify-center lg:justify-end"
         >
           <div className="relative w-72 h-80 md:w-80 md:h-96 rounded-2xl border border-border bg-card shadow-[var(--shadow-elevated)] overflow-hidden border-gradient">
-            <div className="absolute inset-0 flex flex-col items-center justify-center text-muted-foreground/40">
-              <User size={64} strokeWidth={1} />
-              <span className="mt-3 text-xs font-medium tracking-wide uppercase">
-                CEO Portrait
-              </span>
-            </div>
+            <img
+              src={niteshPhoto}
+              alt="Nitesh Ahuja, P.E — President, ATSS"
+              className="absolute inset-0 h-full w-full object-cover"
+            />
             <div className="absolute -bottom-6 -right-6 h-32 w-32 rounded-full bg-primary/10 blur-2xl" />
             <div className="absolute -top-6 -left-6 h-24 w-24 rounded-full bg-accent/10 blur-2xl" />
           </div>
